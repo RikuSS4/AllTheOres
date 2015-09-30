@@ -41,7 +41,7 @@ public class Blocks {
 			if (Reference.isUBCLoaded && (ore.underlyingBlockName.equals("stone") || ore.underlyingBlockName.equals("minecraft:stone"))) {
 				// Underground Biomes Constructs Support
 				try {
-					UBAPIHook.ubAPIHook.ubOreTexturizer.setupUBOre(ore, 0, Reference.MOD_ID.toLowerCase() + ":" + ore.name + "_overlay", event);
+					UBAPIHook.ubAPIHook.ubOreTexturizer.setupUBOre(ore, Reference.MOD_ID.toLowerCase() + ":" + ore.name + "_overlay", event);
 				} catch (Exception err) {
 					LogHelper.info(err.toString());
 				}

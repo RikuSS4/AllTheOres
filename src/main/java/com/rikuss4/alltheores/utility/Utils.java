@@ -177,7 +177,7 @@ public class Utils {
 	}
 
 	public static boolean isBetween(int num, int min, int max) {
-		return min <= num && num <= max;
+		return num >= min && num <= max;
 	}
 
 	public static ItemStack getOreDict(String name) {

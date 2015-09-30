@@ -1,5 +1,8 @@
 package com.rikuss4.alltheores.items.Resources;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -20,20 +23,25 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class Dust extends Item {
 	private String name;
+	private String baseName;
+	private String dustType;
 	private ATOOre ore;
-	private String oreDictName;
+	private List<String> oreDictNames = new ArrayList<String> ();
 	private int color;
 	private int burnTime;
 	private int renderType;
 
-	public Dust(String name, ATOOre ore, int color, int renderType, int burnTime) {
+	public Dust(String name, ATOOre ore, int color, String type, List<String> oreDictList, int renderType, int burnTime) {
 		super();
-		setName(name.toLowerCase() + "_" + "dust");
-		setUnlocalizedName(name.toLowerCase() + "_" + "dust");
+		String ltype = type.toLowerCase();
+		setBaseName(name.toLowerCase());
+		setName(name.toLowerCase() + (ltype.equals("") ? "" : "_") + ltype);
+		setType(type);
+		setUnlocalizedName(name.toLowerCase() + (ltype.equals("") ? "" : "_") + ltype);
 		setOre(ore);
 		setColor(color);
 		setBurnTime(burnTime);
-		setOreDictName("dust", name);
+		setOreDictName(oreDictList, name);
 		setRenderType(renderType);
 		setCreativeTab(CreativeTabs.tabAllSearch);
 	}
@@ -51,6 +59,22 @@ public class Dust extends Item {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getBaseName() {
+		return baseName;
+	}
+
+	public void setBaseName(String baseName) {
+		this.baseName = baseName;
+	}
+
+	public String getType() {
+		return dustType;
+	}
+
+	public void setType(String type) {
+		this.dustType = type;
 	}
 
 	public void setColor(int color) {
@@ -73,12 +97,18 @@ public class Dust extends Item {
 		this.ore = ore;
 	}
 
-	public String getOreDictName() {
-		return oreDictName;
+	public List<String> getOreDictName() {
+		return oreDictNames;
 	}
 
 	public void setOreDictName(String prefix, String oreDictName) {
-		this.oreDictName = (prefix.equals("") ? oreDictName.toLowerCase().charAt(0) + Utils.capitalize(oreDictName.substring(1)) : prefix + Utils.capitalize(oreDictName)).replaceAll(" ", "");
+		this.oreDictNames.add((prefix.equals("") ? oreDictName.toLowerCase().charAt(0) + Utils.capitalize(oreDictName.substring(1)) : prefix + Utils.capitalize(oreDictName)).replaceAll(" ", ""));
+	}
+
+	public void setOreDictName(List<String> prefixs, String oreDictName) {
+		for (String prefix : prefixs) {
+			this.oreDictNames.add((prefix.equals("") ? oreDictName.toLowerCase().charAt(0) + Utils.capitalize(oreDictName.substring(1)) : prefix + Utils.capitalize(oreDictName)).replaceAll(" ", ""));
+		}
 	}
 
 	public int getRenderType() {
@@ -99,7 +129,9 @@ public class Dust extends Item {
 
 	public void registerOreDict() {
 		if (getOreDictName() != null) {
-			OreDictionary.registerOre(getOreDictName(), this);
+			for (String oreDictName : getOreDictName()) {
+				OreDictionary.registerOre(oreDictName, this);
+			}
 		}
 	}
 

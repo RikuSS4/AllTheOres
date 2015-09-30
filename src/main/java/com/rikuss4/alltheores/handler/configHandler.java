@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -397,6 +398,7 @@ public class configHandler {
 							// Section: Ingot setup
 							String ingotName = "";
 							String ingotType = "ingot";
+							String ingotOreDictList = "";
 							int ingotMeta = -1;
 							int ingotRenderType = 0;
 							int ingotBurnTime = 0;
@@ -410,6 +412,9 @@ public class configHandler {
 							if (config.hasKey(category, "ingotType")) {
 								ingotType = config.get(category, "ingotType", "ingot").getString();
 							}
+							if (config.hasKey(category, "ingotOreDictList")) {
+								ingotOreDictList = config.get(category, "ingotOreDictList", "").getString();
+							}
 							if (config.hasKey(category, "ingotRenderType")) {
 								ingotRenderType = config.get(category, "ingotRenderType", 0).getInt();
 							}
@@ -421,12 +426,15 @@ public class configHandler {
 							}
 							// Register Ingot
 							if (ingotEnable && oreType.equals("")) {
-								ore.setIngot(ingotMeta < 0 ? ingotName : ingotName + ":" + ingotMeta, new Ingot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotRenderType, ingotBurnTime), ingotForce);
+								ingotOreDictList = (ingotOreDictList.equalsIgnoreCase("") ? ingotType : ingotOreDictList);
+								List<String> ingotOreDictListArray = new ArrayList<String>(Arrays.asList(ingotOreDictList.split("\\s*,\\s*")));;
+								ore.setIngot(ingotMeta < 0 ? ingotName : ingotName + ":" + ingotMeta, new Ingot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime), ingotForce);
 							}
 
 							// Section: Nugget setup
 							String nuggetName = "";
 							String nuggetType = "nugget";
+							String nuggetOreDictList = "";
 							int nuggetMeta = -1;
 							int nuggetRenderType = 0;
 							int nuggetBurnTime = 0;
@@ -440,6 +448,9 @@ public class configHandler {
 							if (config.hasKey(category, "nuggetType")) {
 								nuggetType = config.get(category, "nuggetType", "nugget").getString();
 							}
+							if (config.hasKey(category, "nuggetOreDictList")) {
+								nuggetOreDictList = config.get(category, "nuggetOreDictList", "").getString();
+							}
 							if (config.hasKey(category, "nuggetRenderType")) {
 								nuggetRenderType = config.get(category, "nuggetRenderType", 0).getInt();
 							}
@@ -451,7 +462,9 @@ public class configHandler {
 							}
 							// Register Nugget
 							if (nuggetEnable && oreType.equals("")) {
-								ore.setNugget(nuggetMeta < 0 ? nuggetName : nuggetName + ":" + nuggetMeta, new Nugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetRenderType, nuggetBurnTime), nuggetForce);
+								nuggetOreDictList = (nuggetOreDictList.equalsIgnoreCase("") ? nuggetType : nuggetOreDictList);
+								List<String> nuggetOreDictListArray = new ArrayList<String>(Arrays.asList(nuggetOreDictList.split("\\s*,\\s*")));;
+								ore.setNugget(nuggetMeta < 0 ? nuggetName : nuggetName + ":" + nuggetMeta, new Nugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetOreDictListArray, nuggetRenderType, nuggetBurnTime), nuggetForce);
 							}
 
 							// Section: Dust setup
@@ -459,6 +472,8 @@ public class configHandler {
 							int dustBurnTime = 0;
 							int dustColor = -1;
 							String dustName = "";
+							String dustType = "dust";
+							String dustOreDictList = "";
 							int dustMeta = -1;
 							int dustAmount = Math.max(2, oreDropMax * 2);
 							if (config.hasKey(category, "dust")) {
@@ -466,6 +481,12 @@ public class configHandler {
 							}
 							if (config.hasKey(category, "dustMeta")) {
 								dustMeta = config.get(category, "dustMeta", -1).getInt();
+							}
+							if (config.hasKey(category, "dustType")) {
+								dustType = config.get(category, "dustType", "dust").getString();
+							}
+							if (config.hasKey(category, "dustOreDictList")) {
+								dustOreDictList = config.get(category, "dustOreDictList", "").getString();
 							}
 							if (config.hasKey(category, "dustAmount")) {
 								dustAmount = config.get(category, "dustAmount", dustAmount).getInt();
@@ -481,7 +502,9 @@ public class configHandler {
 							}
 							// Register Dust
 							if (dustEnable && oreType.equals("")) {
-								ore.setDust(dustMeta < 0 ? dustName : dustName + ":" + dustMeta, new Dust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustRenderType, dustBurnTime), dustForce);
+								dustOreDictList = (dustOreDictList.equalsIgnoreCase("") ? dustType : dustOreDictList);
+								List<String> dustOreDictListArray = new ArrayList<String>(Arrays.asList(dustOreDictList.split("\\s*,\\s*")));;
+								ore.setDust(dustMeta < 0 ? dustName : dustName + ":" + dustMeta, new Dust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustType, dustOreDictListArray, dustRenderType, dustBurnTime), dustForce);
 							}
 
 							// Section: Dust Tiny setup
@@ -489,12 +512,21 @@ public class configHandler {
 							int dustTinyBurnTime = 0;
 							int dustTinyColor = -1;
 							String dustTinyName = "";
+							String dustTinyType = "dustTiny";
+							String dustTinyOreDictList = "";
 							int dustTinyMeta = -1;
+							
 							if (config.hasKey(category, "dustTiny")) {
 								dustTinyName = config.get(category, "dustTiny", "").getString();
 							}
 							if (config.hasKey(category, "dustTinyMeta")) {
 								dustTinyMeta = config.get(category, "dustTinyMeta", -1).getInt();
+							}
+							if (config.hasKey(category, "dustTinyType")) {
+								dustType = config.get(category, "dustTinyType", "dustTiny").getString();
+							}
+							if (config.hasKey(category, "dustTinyOreDictList")) {
+								dustTinyOreDictList = config.get(category, "dustTinyOreDictList", "").getString();
 							}
 							if (config.hasKey(category, "dustTinyRenderType")) {
 								dustTinyRenderType = config.get(category, "dustTinyRenderType", 0).getInt();
@@ -507,7 +539,9 @@ public class configHandler {
 							}
 							// Register Tiny Dust
 							if (dustTinyEnable && oreType.equals("")) {
-								ore.setDustTiny(dustTinyMeta < 0 ? dustTinyName : dustTinyName + ":" + dustTinyMeta, new DustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyRenderType, dustTinyBurnTime), dustTinyForce);
+								dustTinyOreDictList = (dustTinyOreDictList.equalsIgnoreCase("") ? dustTinyType : dustTinyOreDictList);
+								List<String> dustTinyOreDictListArray = new ArrayList<String>(Arrays.asList(dustTinyOreDictList.split("\\s*,\\s*")));;
+								ore.setDustTiny(dustTinyMeta < 0 ? dustTinyName : dustTinyName + ":" + dustTinyMeta, new DustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyType, dustTinyOreDictListArray, dustTinyRenderType, dustTinyBurnTime), dustTinyForce);
 							}
 
 							// Section: Crushed Ore setup

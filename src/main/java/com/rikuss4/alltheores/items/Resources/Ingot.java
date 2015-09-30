@@ -1,5 +1,8 @@
 package com.rikuss4.alltheores.items.Resources;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -21,15 +24,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class Ingot extends Item {
 	private String name;
 	private String baseName;
-	private ATOOre ore;
-	private String oreDictName;
 	private String ingotType;
+	private ATOOre ore;
+	private List<String> oreDictNames = new ArrayList<String> ();
 	private int color;
 	private int burnTime;
 	private int renderType;
-	private int amount;
 
-	public Ingot(String name, ATOOre ore, int color, String type, int renderType, int burnTime) {
+	public Ingot(String name, ATOOre ore, int color, String type, List<String> oreDictList, int renderType, int burnTime) {
 		super();
 		String ltype = type.toLowerCase();
 		setBaseName(name.toLowerCase());
@@ -39,7 +41,7 @@ public class Ingot extends Item {
 		setOre(ore);
 		setColor(color);
 		setBurnTime(burnTime);
-		setOreDictName(type, name);
+		setOreDictName(oreDictList, name);
 		setRenderType(renderType);
 		setCreativeTab(CreativeTabs.tabAllSearch);
 	}
@@ -91,14 +93,6 @@ public class Ingot extends Item {
 		}
 	}
 
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
-
 	public ATOOre getOre() {
 		return ore;
 	}
@@ -107,12 +101,27 @@ public class Ingot extends Item {
 		this.ore = ore;
 	}
 
-	public String getOreDictName() {
-		return oreDictName;
+	public List<String> getOreDictName() {
+		return oreDictNames;
 	}
 
 	public void setOreDictName(String prefix, String oreDictName) {
-		this.oreDictName = (prefix.equals("") ? oreDictName.toLowerCase() : prefix + Utils.capitalize(oreDictName.toLowerCase())).replaceAll(" ", "");
+		this.oreDictNames.add((prefix.equals("") ? oreDictName.toLowerCase() : prefix + Utils.capitalize(oreDictName.toLowerCase())).replaceAll(" ", ""));
+	}
+
+	public void setOreDictName(List<String> prefixs, String oreDictName) {
+		if(prefixs == null) return;
+		if(oreDictName == null) return;
+		LogHelper.mod_debug("\"" + prefixs.toString() + "\"");
+		for (String prefix : prefixs) {
+			LogHelper.mod_debug("\"" + prefix.toString() + "\"");
+			LogHelper.mod_debug("\"" + oreDictName.toString() + "\"");
+			LogHelper.mod_debug("\"" + Utils.capitalize(oreDictName).toString() + "\"");
+			if(prefix.equals(""))
+				this.oreDictNames.add((oreDictName.toLowerCase().charAt(0) + Utils.capitalize(oreDictName.substring(1))).replaceAll(" ", ""));
+			else
+				this.oreDictNames.add((prefix + Utils.capitalize(oreDictName)).replaceAll(" ", ""));
+		}
 	}
 
 	public int getRenderType() {
@@ -133,7 +142,9 @@ public class Ingot extends Item {
 
 	public void registerOreDict() {
 		if (getOreDictName() != null) {
-			OreDictionary.registerOre(getOreDictName(), this);
+			for (String oreDictName : getOreDictName()) {
+				OreDictionary.registerOre(oreDictName, this);
+			}
 		}
 	}
 

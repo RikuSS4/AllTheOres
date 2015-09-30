@@ -1,5 +1,8 @@
 package com.rikuss4.alltheores.items.Resources;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -21,21 +24,24 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class Nugget extends Item {
 	private String name;
 	private String baseName;
+	private String nuggetType;
 	private ATOOre ore;
-	private String oreDictName;
+	private List<String> oreDictNames = new ArrayList<String> ();
 	private int color;
 	private int burnTime;
 	private int renderType;
 
-	public Nugget(String name, ATOOre ore, int color, String type, int renderType, int burnTime) {
+	public Nugget(String name, ATOOre ore, int color, String type, List<String> oreDictList, int renderType, int burnTime) {
 		super();
+		String ltype = type.toLowerCase();
 		setBaseName(name.toLowerCase());
-		setName(name.toLowerCase() + (type.equals("") ? "" : "_") + type);
-		setUnlocalizedName(name.toLowerCase() + (type.equals("") ? "" : "_") + type);
-		setBurnTime(burnTime);
+		setName(name.toLowerCase() + (ltype.equals("") ? "" : "_") + ltype);
+		setType(type);
+		setUnlocalizedName(name.toLowerCase() + (ltype.equals("") ? "" : "_") + ltype);
 		setOre(ore);
 		setColor(color);
-		setOreDictName(type, name);
+		setBurnTime(burnTime);
+		setOreDictName(oreDictList, name);
 		setRenderType(renderType);
 		setCreativeTab(CreativeTabs.tabAllSearch);
 	}
@@ -63,6 +69,14 @@ public class Nugget extends Item {
 		this.baseName = baseName;
 	}
 
+	public String getType() {
+		return nuggetType;
+	}
+
+	public void setType(String type) {
+		this.nuggetType = type;
+	}
+
 	public void setColor(int color) {
 		this.color = color;
 	}
@@ -83,13 +97,29 @@ public class Nugget extends Item {
 		this.ore = ore;
 	}
 
-	public String getOreDictName() {
-		return oreDictName;
+	public List<String> getOreDictName() {
+		return oreDictNames;
+	}
+	
+	public void setOreDictName(String prefix, String oreDictName) {
+		this.oreDictNames.add((prefix.equals("") ? oreDictName.toLowerCase() : prefix + Utils.capitalize(oreDictName.toLowerCase())).replaceAll(" ", ""));
 	}
 
-	public void setOreDictName(String prefix, String oreDictName) {
-		this.oreDictName = (prefix.equals("") ? oreDictName.toLowerCase().charAt(0) + Utils.capitalize(oreDictName.substring(1)) : prefix + Utils.capitalize(oreDictName)).replaceAll(" ", "");
+	public void setOreDictName(List<String> prefixs, String oreDictName) {
+		if(prefixs == null) return;
+		if(oreDictName == null) return;
+		LogHelper.mod_debug("\"" + prefixs.toString() + "\"");
+		for (String prefix : prefixs) {
+			LogHelper.mod_debug("\"" + prefix.toString() + "\"");
+			LogHelper.mod_debug("\"" + oreDictName.toString() + "\"");
+			LogHelper.mod_debug("\"" + Utils.capitalize(oreDictName).toString() + "\"");
+			if(prefix.equals(""))
+				this.oreDictNames.add((oreDictName.toLowerCase().charAt(0) + Utils.capitalize(oreDictName.substring(1))).replaceAll(" ", ""));
+			else
+				this.oreDictNames.add((prefix + Utils.capitalize(oreDictName)).replaceAll(" ", ""));
+		}
 	}
+
 
 	public int getRenderType() {
 		return renderType;
@@ -109,7 +139,9 @@ public class Nugget extends Item {
 
 	public void registerOreDict() {
 		if (getOreDictName() != null) {
-			OreDictionary.registerOre(getOreDictName(), this);
+			for (String oreDictName : getOreDictName()) {
+				OreDictionary.registerOre(oreDictName, this);
+			}
 		}
 	}
 

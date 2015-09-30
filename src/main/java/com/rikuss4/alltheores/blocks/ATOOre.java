@@ -524,8 +524,8 @@ public class ATOOre extends BlockOre {
 	
 	private Random rand = new Random();
 	
-	//@Override
-	public Item getItemDropped2(int metadata, Random random, int fortune) {
+	@Override
+	public Item getItemDropped(int metadata, Random random, int fortune) {
 		LogHelper.mod_debug("Block Dropped:" + new ItemStack(this).getUnlocalizedName());
 		// Drop section
 		// Drop types:
@@ -539,41 +539,29 @@ public class ATOOre extends BlockOre {
 			case 1:
 				if (getOutputSmelting() != null) {
 					return getOutputSmelting().getItem();
-				} else {
-					return Item.getItemFromBlock(this);
 				}
 			case 2:
 				if (getIngot() != null) {
 					return getIngot().getItem();
-				} else {
-					return Item.getItemFromBlock(this);
 				}
 			case 3:
 				if (getDust() != null) {
 					return getDust().getItem();
-				} else {
-					return Item.getItemFromBlock(this);
 				}
 			case 4:
 				if (getNugget() != null) {
 					return getNugget().getItem();
-				} else {
-					return Item.getItemFromBlock(this);
 				}
 			case 5:
 				if (getDustTiny() != null) {
 					return getDustTiny().getItem();
-				} else {
-					return Item.getItemFromBlock(this);
 				}
 			case 6:
 				if (getBaseOre() != null) {
 					return getBaseOre().getItem();
-				} else {
-					return Item.getItemFromBlock(this);
 				}
 			default:
-				if (Reference.isEIOLoaded) {
+				if (Reference.isUBCLoaded) {
 					//oreBlock.getItemDropped(metadata, random, fortune);
 	            if (oreBlock != null) LogHelper.mod_debug("oreBlock: " + oreBlock.getUnlocalizedName());
 					//BlockSets.oreUbifier.get(new OreBlockInfo (this.oreBlock, this.oreMeta, this.stoneBlock, this.oreLevel+1));
@@ -615,9 +603,9 @@ public class ATOOre extends BlockOre {
 	@Override
 	public int quantityDropped(int metadata, int fortune, Random random) {
 		LogHelper.mod_debug("Block Drop Min:" + getDropMin());
-		LogHelper.mod_debug("Block Drop Min:" + getDropMin());
+		LogHelper.mod_debug("Block Drop Max:" + getDropMax());
 		LogHelper.mod_debug("Block Drop Type:" + dropType);
-		if (Utils.isBetween(dropType, 1, 5)) {
+		if (Utils.isBetween(dropType, 1, 6)) {
 			int min = Math.min(getDropMin() + fortune, getDropMax());
 			int amt = MathHelper.getRandomIntegerInRange(rand, min, getDropMax());
 			LogHelper.mod_debug("Block Drop Amount:" + amt);
@@ -630,8 +618,9 @@ public class ATOOre extends BlockOre {
 	@Override
 	public int getExpDrop(IBlockAccess world, int metadata, int fortune) {
 		int exp = 0;
-		if(Utils.isBetween(dropType, 1,5))
+		if(Utils.isBetween(dropType, 1, 5))
 			exp = MathHelper.ceiling_double_int(MathHelper.getRandomIntegerInRange(rand, getHarvestLevel(metadata) + getDropMin(), getHarvestLevel(metadata) + getDropMax()));
+		LogHelper.mod_debug("Block XP Dropped:" + exp);
 		return exp;
 	}
 
@@ -1072,7 +1061,7 @@ public class ATOOre extends BlockOre {
 				ItemStack output = new ItemStack(sword, 1);
 
 				if (sword != null && ingot != null && ingot.getOreDictName() != null) {
-					inputOreDict = ingot.getOreDictName();
+					inputOreDict = ingot.getOreDictName().get(0);
 					GameRegistry.addRecipe(new ShapedOreRecipe(output, " n ", " n ", " m ", 'n', inputOreDict, 'm', inputStick));
 				} else if (sword != null) {
 					GameRegistry.addRecipe(new ShapedOreRecipe(output, " n ", " n ", " m ", 'n', input, 'm', inputStick));
@@ -1085,7 +1074,7 @@ public class ATOOre extends BlockOre {
 				String inputStick = "stickWood";
 				String inputIngot = null;
 				if (input != null && ingot != null && ingot.getOreDictName() != null) {
-					inputIngot = ingot.getOreDictName();
+					inputIngot = ingot.getOreDictName().get(0);
 					if (spade != null) {
 						ItemStack output = new ItemStack(spade, 1, 0);
 						GameRegistry.addRecipe(new ShapedOreRecipe(output, " n ", " m ", " m ", 'n', inputIngot, 'm', inputStick));
@@ -1125,7 +1114,7 @@ public class ATOOre extends BlockOre {
 			// Armor Crafting
 			if (Reference.CONFIG_ADD_CRAFTING_ARMOR) {
 				if (ingot != null && ingot.getOreDictName() != null) {
-					String input = ingot.getOreDictName();
+					String input = ingot.getOreDictName().get(0);
 					if (helmet != null) {
 						GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(helmet, 1, 0), "nnn", "n n", " m ", 'n', input));
 					}
@@ -1429,28 +1418,26 @@ public class ATOOre extends BlockOre {
 				// Poor Nether/End Ores
 				if (isDust()) {
 					crushedItem = getDustTiny();
-					dropType = (dropType == 3 || dropType == 0) ? 5 : 6;
+					dropType = (dropType == 3 || dropType == 0) ? 5 : 0;
 					setOreValues(2, 8, 4, 8, 8);
 					setSmeltingOutput(getDustTiny(smeltAmount));
 				} else {
 					crushedItem = getNugget();
-					dropType = (dropType == 2 || dropType == 0) ? 4 : 6;
+					dropType = (dropType == 2 || dropType == 0) ? 0 : 0;
 					setOreValues(1, 1, 3, 6, 6);
 					setSmeltingOutput(getNugget(smeltAmount));
 				}
 			} else {
 				// Poor Sand/Gravel/Stone Ores
 				if (isDust()) {
-					dropType = 5;
 					crushedItem = getDustTiny();
-					dropType = (dropType == 3 || dropType == 0) ? 5 : 6;
+					dropType = (dropType == 3) ? 5 : 0;
 					setOreValues(1, 4, 2, 4, 4);
 					setSmeltingOutput(getDustTiny(smeltAmount));
 				} else {
-					dropType = 0;
 					crushedItem = getNugget();
-					dropType = (dropType == 2 || dropType == 0) ? 4 : 6;
-					setOreValues(1, 1, 1, 2, 2);
+					dropType = (dropType == 2) ? 4 : 6;
+					setOreValues(1, 2, 1, 2, 2);
 					setSmeltingOutput(getNugget(smeltAmount));
 				}
 			}
@@ -1482,8 +1469,8 @@ public class ATOOre extends BlockOre {
 						setOreValues(2, 6, 3, 6, 6);
 						setSmeltingOutput(getIngot(smeltAmount));
 					} else {
-						dropType = 0;
-						setOreValues(1, 1, 3, 6, 6);
+						dropType = 6;
+						setOreValues(3, 3, 3, 6, 6);
 						setSmeltingOutput(smeltAmount);
 					}
 				}
