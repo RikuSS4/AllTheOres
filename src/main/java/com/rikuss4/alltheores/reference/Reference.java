@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.launchwrapper.Launch;
 
 import com.rikuss4.alltheores.blocks.ATOOre;
 
@@ -16,7 +17,7 @@ public class Reference {
 	public static final String DEPS = "after:*;after:aobd";
 	public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ":";
 	public static final String CONFIG_PREFIX = ".";
-	public static final Boolean DEBUG = true;
+	public static final Boolean DEBUG = (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
 	public static boolean isIC2Loaded = false;
 	public static boolean isEIOLoaded = false;
