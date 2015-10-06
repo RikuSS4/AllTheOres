@@ -29,13 +29,14 @@ public class ATOBrick extends Block {
 	private String fullname;
 	private String oreDictName;
 	private int color;
+	private int burnTime;
 	private int blockRenderType;
 	private boolean fallInstantly = false;
 	private boolean fall = false;
 	private boolean isCraftable = false;
 	private ATOOre ore;
 
-	public ATOBrick(String name, ATOOre ore, int color, int renderType) {
+	public ATOBrick(String name, ATOOre ore, int color, int renderType, int burnTime) {
 		super(Material.iron);
 		this.setStepSound(soundTypeMetal);
 		String lname = name.replaceAll("__", "_").toLowerCase() + "_brick";

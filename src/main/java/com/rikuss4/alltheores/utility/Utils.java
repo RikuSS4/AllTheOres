@@ -94,7 +94,7 @@ public class Utils {
 	}
 
 	public static ItemStack getItemStack(String itemName, int stackSize) {
-		if (itemName == null || Item.itemRegistry.getObject(itemName) == null) {
+		if (itemName == null || (Item) Item.itemRegistry.getObject(itemName) == null) {
 			return null;
 		}
 		return new ItemStack((Item) Item.itemRegistry.getObject(itemName), stackSize);
@@ -158,6 +158,12 @@ public class Utils {
 	 * }
 	 */
 
+	public static String getSpecialName(String name) {
+		name = Character.toString(name.charAt(0)).toLowerCase() + name.substring(1);
+		name.replaceAll(" ", "_");
+		return name.replaceAll("([A-Z])", "_$1").toLowerCase();
+	}
+
 	public static String capitalize(String s1) {
 		if (s1.lastIndexOf("__") > 0) {
 			s1 = s1.substring(0, s1.lastIndexOf("__"));
@@ -204,15 +210,12 @@ public class Utils {
 				info[0] = ui.modId;
 				info[1] = ui.name;
 				info[2] = Integer.toString(item.getItemDamage());
-				info[3] = OreDictionary.getOreName(OreDictionary.getOreID(item)).replaceAll(" ", "");
+				info[3] = OreDictionary.getOreName(OreDictionary.getOreID(item));
 				info[3] = info[3].equalsIgnoreCase("unknown") ? "" : info[3];
 				return info;
-			} else {
-				return null;
 			}
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	public static String removeEIORecipe(ItemStack input) {
@@ -261,6 +264,7 @@ public class Utils {
 		for (ATOOre ore : Reference.ORES_LIST) {
 			LogHelper.mod_debug("*** Ore being checked " + new ItemStack(ore).getDisplayName() + " ***");
 
+			LogHelper.mod_debug(Utils.capitalize(ore.baseName));
 			for (Object recipe : recipes) {
 				if (recipe != null) {
 					ShapedOreRecipe iRecipe = null;
@@ -268,8 +272,21 @@ public class Utils {
 						iRecipe = (ShapedOreRecipe) recipe;
 					} catch (ClassCastException e) {
 					}
-					if (!(iRecipe != null && ((ore.getIngot(1) != null && Reference.CONFIG_ADD_CRAFTING_INGOTS && iRecipe.getRecipeOutput().isItemEqual(ore.getIngot(1))) || (ore.getDust(1) != null && Reference.CONFIG_ADD_CRAFTING_DUSTS && iRecipe.getRecipeOutput().isItemEqual(ore.getDust(1))) || (ore.getNugget(1) != null && Reference.CONFIG_ADD_CRAFTING_NUGGETS && iRecipe.getRecipeOutput().isItemEqual(ore.getNugget(1))) || (ore.getDustTiny(1) != null && Reference.CONFIG_ADD_CRAFTING_DUSTSTINY && iRecipe.getRecipeOutput().isItemEqual(ore.getDustTiny(1))) || (ore.getIngot(1) != null && Reference.CONFIG_ADD_CRAFTING_BLOCKS && iRecipe.getRecipeOutput().isItemEqual(ore.getBlock(1))) || (ore.getIngot(1) != null && Reference.CONFIG_ADD_CRAFTING_BRICKS && iRecipe.getRecipeOutput().isItemEqual(ore.getBrick(1)))))) {
-						newRecipes.add(recipe);
+					if (iRecipe != null) {
+						Boolean match = false;
+						if(Reference.CONFIG_ADD_CRAFTING_BLOCK && ore.blockRecipe) {
+							ArrayList<ItemStack> oreDict = OreDictionary.getOres("block" + Utils.capitalize(ore.baseName));
+							for (ItemStack item : oreDict) {
+								if(item.isItemEqual(iRecipe.getRecipeOutput())) {
+									LogHelper.mod_debug("Match Found for " + iRecipe.getRecipeOutput().getDisplayName());
+									match = true;
+									break;
+								}
+							}
+							if (!match)
+								newRecipes.add(recipe);
+						} else
+							newRecipes.add(recipe);
 					}
 				}
 			}
@@ -279,5 +296,11 @@ public class Utils {
 			CraftingManager.getInstance().getRecipeList().retainAll(newRecipes);
 			newRecipes.clear();
 		}
+	}
+	
+	public static boolean recipeExists(String type, String name) {
+		if(!OreDictionary.getOres(type + Utils.capitalize(name)).isEmpty())
+			return true;
+		return false;
 	}
 }

@@ -48,92 +48,57 @@ public class Blocks {
 			}
 
 			if (ore.ore == null) {
-				// Register the storage blocks
-				if (ore.createBlock()) {
-					BLOCK_LIST.add(ore.block);
-				}
-
-				// Register the bricks
-				if (ore.createBrick()) {
-					BRICK_LIST.add(ore.brick);
-				}
-
-				// Register Items from ore
-				if (ore.createIngot()) {
-					GameRegistry.registerItem(ore.ingot, ore.ingot.getName());
-					ore.ingot.setCreativeTab(ATOCreativeTab.ITEMS_TAB);
-				}
-				if (ore.createNugget()) {
-					GameRegistry.registerItem(ore.nugget, ore.nugget.getName());
-					ore.nugget.setCreativeTab(ATOCreativeTab.ITEMS_TAB);
-				}
-				if (ore.createDust()) {
-					GameRegistry.registerItem(ore.dust, ore.dust.getName());
-					ore.dust.setCreativeTab(ATOCreativeTab.ITEMS_TAB);
-				}
-				if (ore.createDustTiny()) {
-					GameRegistry.registerItem(ore.dustTiny, ore.dustTiny.getName());
-					ore.dustTiny.setCreativeTab(ATOCreativeTab.ITEMS_TAB);
-				}
-				if (ore.createCrushed()) {
-					GameRegistry.registerItem(ore.crushed, ore.crushed.getName());
-					ore.crushed.setCreativeTab(ATOCreativeTab.ITEMS_TAB);
-				}
-				if (ore.createCrushedPurified()) {
-					GameRegistry.registerItem(ore.crushedPurified, ore.crushedPurified.getName());
-					ore.crushedPurified.setCreativeTab(ATOCreativeTab.ITEMS_TAB);
-				}
 				// Ingot based recipes
 				if (ore.getIngot(1) != null) {
 					// Armor
 					// Helmet
 					if (ore.helmet != null) {
 						GameRegistry.registerItem(ore.helmet, ore.helmet.getName());
-						//ore.helmet.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
+						// ore.helmet.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
 					}
 					// Chestplate
 					if (ore.chestplate != null) {
 						GameRegistry.registerItem(ore.chestplate, ore.chestplate.getName());
-						//ore.chestplate.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
+						// ore.chestplate.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
 					}
 					// Legs
 					if (ore.legs != null) {
 						GameRegistry.registerItem(ore.legs, ore.legs.getName());
-						//ore.legs.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
+						// ore.legs.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
 					}
 					// Boots
 					if (ore.boots != null) {
 						GameRegistry.registerItem(ore.boots, ore.boots.getName());
-						//ore.boots.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
+						// ore.boots.setCreativeTab(ATOCreativeTab.ARMOR_TAB);
 					}
 
 					// Weapons
 					// Sword
 					if (ore.sword != null) {
 						GameRegistry.registerItem(ore.sword, ore.sword.getName());
-						//ore.sword.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
+						// ore.sword.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
 					}
 
 					// Tools
 					// Spade
 					if (ore.spade != null) {
 						GameRegistry.registerItem(ore.spade, ore.spade.getName());
-						//ore.spade.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
+						// ore.spade.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
 					}
 					// Hoe
 					if (ore.hoe != null) {
 						GameRegistry.registerItem(ore.hoe, ore.hoe.getName());
-						//ore.hoe.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
+						// ore.hoe.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
 					}
 					// Axe
 					if (ore.axe != null) {
 						GameRegistry.registerItem(ore.axe, ore.axe.getName());
-						//ore.axe.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
+						// ore.axe.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
 					}
 					// Pickaxe
 					if (ore.pickaxe != null) {
 						GameRegistry.registerItem(ore.pickaxe, ore.pickaxe.getName());
-						//ore.pickaxe.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
+						// ore.pickaxe.setCreativeTab(ATOCreativeTab.TOOLS_TAB);
 					}
 				}
 			}
@@ -149,11 +114,14 @@ public class Blocks {
 	}
 
 	public static void init() {
-		// Register blocks in ore dictionary
 		for (ATOOre ore : Reference.ORES_LIST) {
+			ore.removeCrafting(ore);
+		}
+		for (ATOOre ore : Reference.ORES_LIST) {
+			// Register blocks in ore dictionary
 			LogHelper.mod_debug("Ores Registry:");
 			LogHelper.mod_debug(ore.oreDictName);
-			//ore.registerOreDict();
+			// ore.registerOreDict();
 			if (ore.ore == null) {
 				if (ore.createBlock()) {
 					ore.block.registerOreDict();
@@ -162,17 +130,15 @@ public class Blocks {
 					ore.brick.registerOreDict();
 				}
 			}
-		}
-		// Register crafting recipes
-		Utils.removeCrafting();
-		StringBuilder toSend = new StringBuilder();
-		for (ATOOre ore : Reference.ORES_LIST) {
+
+			// Register crafting recipes
 			if (Reference.isIC2Loaded)
 				ore.registerIC2Recipes();
 			if (Reference.isEIOLoaded)
 				ore.registerEnderIORecipes();
 			ore.registerCrafting();
 			ore.registerSmelting();
+			LogHelper.mod_debug("");
 		}
 	}
 

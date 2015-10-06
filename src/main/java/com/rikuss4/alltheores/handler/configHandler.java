@@ -28,12 +28,12 @@ import com.rikuss4.alltheores.blocks.ATOBlock;
 import com.rikuss4.alltheores.blocks.ATOBrick;
 import com.rikuss4.alltheores.blocks.ATOOre;
 import com.rikuss4.alltheores.items.Armor.Armor;
-import com.rikuss4.alltheores.items.Resources.Crushed;
-import com.rikuss4.alltheores.items.Resources.CrushedPurified;
-import com.rikuss4.alltheores.items.Resources.Dust;
-import com.rikuss4.alltheores.items.Resources.DustTiny;
-import com.rikuss4.alltheores.items.Resources.Ingot;
-import com.rikuss4.alltheores.items.Resources.Nugget;
+import com.rikuss4.alltheores.items.Resources.ATOCrushed;
+import com.rikuss4.alltheores.items.Resources.ATOCrushedPurified;
+import com.rikuss4.alltheores.items.Resources.ATODust;
+import com.rikuss4.alltheores.items.Resources.ATODustTiny;
+import com.rikuss4.alltheores.items.Resources.ATOIngot;
+import com.rikuss4.alltheores.items.Resources.ATONugget;
 import com.rikuss4.alltheores.items.Tools.Axe;
 import com.rikuss4.alltheores.items.Tools.Hoe;
 import com.rikuss4.alltheores.items.Tools.Pickaxe;
@@ -52,12 +52,6 @@ public class configHandler {
 	private static int oreRenderType;
 	private static String underlyingBlock;
 	private static String modID;
-
-	public static String getSpecialName(String name) {
-		name = Character.toString(name.charAt(0)).toLowerCase() + name.substring(1);
-		name.replaceAll(" ", "_");
-		return name.replaceAll("([A-Z])", "_$1").toLowerCase();
-	}
 
 	public static void preInit(Path configDir) {
 		Configuration config = new Configuration(Paths.get(configDir.toString() + "/core.cfg").toFile());
@@ -79,12 +73,12 @@ public class configHandler {
 
 		// Global Enable/Disable
 		Reference.CONFIG_ADD_SMELTING = config.getBoolean("add_smelting", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for smelting");
-		Reference.CONFIG_ADD_CRAFTING_BLOCKS = config.getBoolean("add_crafting_blocks", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting blocks");
-		Reference.CONFIG_ADD_CRAFTING_BRICKS = config.getBoolean("add_crafting_bricks", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting bricks");
-		Reference.CONFIG_ADD_CRAFTING_NUGGETS = config.getBoolean("add_crafting_nuggets", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting nuggets");
+		Reference.CONFIG_ADD_CRAFTING_BLOCK = config.getBoolean("add_crafting_block", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting blocks");
+		Reference.CONFIG_ADD_CRAFTING_BRICK = config.getBoolean("add_crafting_brick", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting bricks");
+		Reference.CONFIG_ADD_CRAFTING_NUGGET = config.getBoolean("add_crafting_nugget", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting nuggets");
 		Reference.CONFIG_ADD_CRAFTING_INGOT = config.getBoolean("add_crafting_ingot", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting ingots");
-		Reference.CONFIG_ADD_CRAFTING_WEAPONS = config.getBoolean("add_crafting_weapons", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting weapons");
-		Reference.CONFIG_ADD_CRAFTING_TOOLS = config.getBoolean("add_crafting_tools", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting tools");
+		Reference.CONFIG_ADD_CRAFTING_WEAPON = config.getBoolean("add_crafting_weapon", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting weapons");
+		Reference.CONFIG_ADD_CRAFTING_TOOL = config.getBoolean("add_crafting_tool", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting tools");
 		Reference.CONFIG_ADD_CRAFTING_ARMOR = config.getBoolean("add_crafting_armor", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting armor");
 		Reference.CONFIG_GENERATE_ORES_CONFIG = config.getBoolean("generate_starter_ores", Configuration.CATEGORY_GENERAL, false, "Enable/Disable generating All.cfg of ores for starting point");
 		Reference.CONFIG_GENERATE_NETHER_ORES = config.getBoolean("generate_nether_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating nether ores from base ores");
@@ -109,8 +103,9 @@ public class configHandler {
 		}
 
 		// // FORTESTING: Preferred mod order
-		Reference.PreferredOrder.add("Metallurgy");
 		Reference.PreferredOrder.add("IC2");
+		Reference.PreferredOrder.add("Metallurgy");
+		Reference.PreferredOrder.add("ThermalFoundation");
 
 		// Make Ores folder if it does not exist
 		File dir = new File(configDir + "/Ores");
@@ -258,33 +253,100 @@ public class configHandler {
 							 * oreHardness = config.get(category, "oreHardness",
 							 * 3).getInt(); }
 							 */
-							if (config.hasKey(category, "oreHarvestLevel")) {
+							if (config.hasKey(category, "oreHarvestLevel"))
 								oreHarvestLevel = config.get(category, "oreHarvestLevel", 0).getInt();
-							}
-							if (config.hasKey(category, "oreDropType")) {
+							if (config.hasKey(category, "oreDropType"))
 								oreDropType = config.get(category, "oreDropType", 0).getInt();
-							}
-							if (config.hasKey(category, "oreRenderType")) {
+							if (config.hasKey(category, "oreRenderType"))
 								oreRenderType = config.get(category, "oreRenderType", 0).getInt();
-							}
-							if (config.hasKey(category, "oreDenseRenderType")) {
+							if (config.hasKey(category, "oreDenseRenderType"))
 								oreDenseRenderType = config.get(category, "oreDenseRenderType", -1).getInt();
-							}
-							if (config.hasKey(category, "orePoorRenderType")) {
+							if (config.hasKey(category, "orePoorRenderType"))
 								orePoorRenderType = config.get(category, "orePoorRenderType", -1).getInt();
-							}
-							if (config.hasKey(category, "oreType")) {
+							if (config.hasKey(category, "oreType"))
 								oreType = config.get(category, "oreType", "").getString();
-							}
-							if (config.hasKey(category, "oreFalls")) {
+							if (config.hasKey(category, "oreFalls"))
 								oreFalls = config.get(category, "oreFalls", false).getBoolean();
-							}
-							if (config.hasKey(category, "oreSilkHarvest")) {
+							if (config.hasKey(category, "oreSilkHarvest"))
 								oreSilkHarvest = config.get(category, "oreSilkHarvest", true).getBoolean();
-							}
-							if (config.hasKey(category, "outputDust")) {
+							if (config.hasKey(category, "outputDust"))
 								outputDust = config.get(category, "outputDust", false).getBoolean();
-							}
+
+							// Enable/Disable Ores
+							Boolean oreDenseNetherEnable = true;
+							Boolean oreDenseEndEnable = true;
+							Boolean oreDenseSandEnable = true;
+							Boolean oreDenseGravelEnable = true;
+							Boolean oreDenseEnable = true;
+							Boolean orePoorNetherEnable = true;
+							Boolean orePoorEndEnable = true;
+							Boolean orePoorSandEnable = true;
+							Boolean orePoorGravelEnable = true;
+							Boolean orePoorEnable = true;
+							Boolean oreNetherEnable = true;
+							Boolean oreEndEnable = true;
+							Boolean oreSandEnable = true;
+							Boolean oreGravelEnable = true;
+							Boolean oreBaseEnable = true;
+							if (config.hasKey(category, "oreDenseNetherEnable"))
+								oreDenseNetherEnable = config.get(category, "oreDenseNetherEnable", true).getBoolean();
+							if (config.hasKey(category, "oreDenseEndEnable"))
+								oreDenseEndEnable = config.get(category, "oreDenseEndEnable", true).getBoolean();
+							if (config.hasKey(category, "oreDenseSandEnable"))
+								oreDenseSandEnable = config.get(category, "oreDenseSandEnable", true).getBoolean();
+							if (config.hasKey(category, "oreDenseGravelEnable"))
+								oreDenseGravelEnable = config.get(category, "oreDenseGravelEnable", true).getBoolean();
+							if (config.hasKey(category, "oreDenseEnable"))
+								oreDenseEnable = config.get(category, "oreDenseEnable", true).getBoolean();
+							if (config.hasKey(category, "orePoorNetherEnable"))
+								orePoorNetherEnable = config.get(category, "orePoorNetherEnable", true).getBoolean();
+							if (config.hasKey(category, "orePoorEndEnable"))
+								orePoorEndEnable = config.get(category, "orePoorEndEnable", true).getBoolean();
+							if (config.hasKey(category, "orePoorSandEnable"))
+								orePoorSandEnable = config.get(category, "orePoorSandEnable", true).getBoolean();
+							if (config.hasKey(category, "orePoorGravelEnable"))
+								orePoorGravelEnable = config.get(category, "orePoorGravelEnable", true).getBoolean();
+							if (config.hasKey(category, "orePoorEnable"))
+								orePoorEnable = config.get(category, "orePoorEnable", true).getBoolean();
+							if (config.hasKey(category, "oreNetherEnable"))
+								oreNetherEnable = config.get(category, "oreNetherEnable", true).getBoolean();
+							if (config.hasKey(category, "oreEndEnable"))
+								oreEndEnable = config.get(category, "oreEndEnable", true).getBoolean();
+							if (config.hasKey(category, "oreSandEnable"))
+								oreSandEnable = config.get(category, "oreSandEnable", true).getBoolean();
+							if (config.hasKey(category, "oreGravelEnable"))
+								oreGravelEnable = config.get(category, "oreGravelEnable", true).getBoolean();
+							if (config.hasKey(category, "oreBaseEnable"))
+								oreBaseEnable = config.get(category, "oreBaseEnable", true).getBoolean();
+
+							// Enable/Disable Recipes
+							boolean blockRecipeEnable = true;
+							boolean brickRecipeEnable = true;
+							boolean ingotRecipeEnable = true;
+							boolean nuggetRecipeEnable = true;
+							boolean dustRecipeEnable = true;
+							boolean dustTinyRecipeEnable = true;
+							boolean weaponRecipeEnable = true;
+							boolean toolsRecipeEnable = true;
+							boolean armorRecipeEnable = true;
+							if (config.hasKey(category, "blockRecipeEnable"))
+								blockRecipeEnable = config.get(category, "blockRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "brickRecipeEnable"))
+								brickRecipeEnable = config.get(category, "brickRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "ingotRecipeEnable"))
+								ingotRecipeEnable = config.get(category, "ingotRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "nuggetRecipeEnable"))
+								nuggetRecipeEnable = config.get(category, "nuggetRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "dustRecipeEnable"))
+								dustRecipeEnable = config.get(category, "dustRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "dustTinyRecipeEnable"))
+								dustTinyRecipeEnable = config.get(category, "dustTinyRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "weaponRecipeEnable"))
+								weaponRecipeEnable = config.get(category, "weaponRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "toolsRecipeEnable"))
+								toolsRecipeEnable = config.get(category, "toolsRecipeEnable", true).getBoolean();
+							if (config.hasKey(category, "armorRecipeEnable"))
+								armorRecipeEnable = config.get(category, "armorRecipeEnable", true).getBoolean();
 
 							// World gen
 							int veinRate = 0;
@@ -389,8 +451,7 @@ public class configHandler {
 								extraDustTinyMeta = config.get(category, "extraDustTinyMeta", -1).getInt();
 							}
 
-
-							// Register Ore
+							// Section: Register Ore
 							ATOOre ore = new ATOOre(oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, oreType, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust, null);
 							ore.oreDenseRenderType = (oreDenseRenderType < 0) ? oreRenderType : oreDenseRenderType;
 							ore.orePoorRenderType = (orePoorRenderType < 0) ? oreRenderType : orePoorRenderType;
@@ -427,8 +488,17 @@ public class configHandler {
 							// Register Ingot
 							if (ingotEnable && oreType.equals("")) {
 								ingotOreDictList = (ingotOreDictList.equalsIgnoreCase("") ? ingotType : ingotOreDictList);
-								List<String> ingotOreDictListArray = new ArrayList<String>(Arrays.asList(ingotOreDictList.split("\\s*,\\s*")));;
-								ore.setIngot(ingotMeta < 0 ? ingotName : ingotName + ":" + ingotMeta, new Ingot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime), ingotForce);
+								List<String> ingotOreDictListArray = new ArrayList<String>(Arrays.asList(ingotOreDictList.split("\\s*,\\s*")));
+								ItemStack ingot = Utils.getItemStack(ingotMeta < 0 ? ingotName : ingotName + ":" + ingotMeta, 1);
+								if (!ingotForce && ingot != null) {
+									LogHelper.mod_debug(oreName + " Ingot: " + ingot.getUnlocalizedName());
+									ore.setIngot(ingot);
+								} else {
+									ATOIngot ATOIngot = new ATOIngot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime);
+									Reference.INGOT_LIST.add(ATOIngot);
+									ore.setIngot(new ItemStack(ATOIngot));
+									LogHelper.mod_debug(oreName + " Ingot: " + ore.getIngot().getUnlocalizedName());
+								}
 							}
 
 							// Section: Nugget setup
@@ -463,8 +533,16 @@ public class configHandler {
 							// Register Nugget
 							if (nuggetEnable && oreType.equals("")) {
 								nuggetOreDictList = (nuggetOreDictList.equalsIgnoreCase("") ? nuggetType : nuggetOreDictList);
-								List<String> nuggetOreDictListArray = new ArrayList<String>(Arrays.asList(nuggetOreDictList.split("\\s*,\\s*")));;
-								ore.setNugget(nuggetMeta < 0 ? nuggetName : nuggetName + ":" + nuggetMeta, new Nugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetOreDictListArray, nuggetRenderType, nuggetBurnTime), nuggetForce);
+								List<String> nuggetOreDictListArray = new ArrayList<String>(Arrays.asList(nuggetOreDictList.split("\\s*,\\s*")));
+								;
+								ItemStack nugget = Utils.getItemStack(nuggetMeta < 0 ? nuggetName : nuggetName + ":" + nuggetMeta, 1);
+								if (!nuggetForce && nugget != null)
+									ore.setNugget(nugget);
+								else {
+									ATONugget ATONugget = new ATONugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetOreDictListArray, nuggetRenderType, nuggetBurnTime);
+									Reference.NUGGET_LIST.add(ATONugget);
+									ore.setNugget(new ItemStack(ATONugget));
+								}
 							}
 
 							// Section: Dust setup
@@ -503,8 +581,16 @@ public class configHandler {
 							// Register Dust
 							if (dustEnable && oreType.equals("")) {
 								dustOreDictList = (dustOreDictList.equalsIgnoreCase("") ? dustType : dustOreDictList);
-								List<String> dustOreDictListArray = new ArrayList<String>(Arrays.asList(dustOreDictList.split("\\s*,\\s*")));;
-								ore.setDust(dustMeta < 0 ? dustName : dustName + ":" + dustMeta, new Dust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustType, dustOreDictListArray, dustRenderType, dustBurnTime), dustForce);
+								List<String> dustOreDictListArray = new ArrayList<String>(Arrays.asList(dustOreDictList.split("\\s*,\\s*")));
+								;
+								ItemStack dust = Utils.getItemStack(dustMeta < 0 ? dustName : dustName + ":" + dustMeta, 1);
+								if (!dustForce && dust != null)
+									ore.setDust(dust);
+								else {
+									ATODust ATODust = new ATODust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustType, dustOreDictListArray, dustRenderType, dustBurnTime);
+									Reference.DUST_LIST.add(ATODust);
+									ore.setDust(new ItemStack(ATODust));
+								}
 							}
 
 							// Section: Dust Tiny setup
@@ -515,7 +601,7 @@ public class configHandler {
 							String dustTinyType = "dustTiny";
 							String dustTinyOreDictList = "";
 							int dustTinyMeta = -1;
-							
+
 							if (config.hasKey(category, "dustTiny")) {
 								dustTinyName = config.get(category, "dustTiny", "").getString();
 							}
@@ -539,9 +625,17 @@ public class configHandler {
 							}
 							// Register Tiny Dust
 							if (dustTinyEnable && oreType.equals("")) {
-								dustTinyOreDictList = (dustTinyOreDictList.equalsIgnoreCase("") ? dustTinyType : dustTinyOreDictList);
-								List<String> dustTinyOreDictListArray = new ArrayList<String>(Arrays.asList(dustTinyOreDictList.split("\\s*,\\s*")));;
-								ore.setDustTiny(dustTinyMeta < 0 ? dustTinyName : dustTinyName + ":" + dustTinyMeta, new DustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyType, dustTinyOreDictListArray, dustTinyRenderType, dustTinyBurnTime), dustTinyForce);
+								dustTinyOreDictList = (dustTinyOreDictList.isEmpty() ? dustTinyType : dustTinyOreDictList);
+								List<String> dustTinyOreDictListArray = new ArrayList<String>(Arrays.asList(dustTinyOreDictList.split("\\s*,\\s*")));
+								;
+								ItemStack dustTiny = Utils.getItemStack(dustTinyMeta < 0 ? dustTinyName : dustTinyName + ":" + dustTinyMeta, 1);
+								if (!dustTinyForce && dustTiny != null)
+									ore.setDustTiny(dustTiny);
+								else {
+									ATODustTiny ATODustTiny = new ATODustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyType, dustTinyOreDictListArray, dustTinyRenderType, dustTinyBurnTime);
+									Reference.DUSTTINY_LIST.add(ATODustTiny);
+									ore.setDustTiny(new ItemStack(ATODustTiny));
+								}
 							}
 
 							// Section: Crushed Ore setup
@@ -549,6 +643,8 @@ public class configHandler {
 							int crushedBurnTime = 0;
 							int crushedColor = -1;
 							String crushedName = "";
+							String crushedType = "crushed";
+							String crushedOreDictList = "";
 							int crushedMeta = -1;
 							int crushedAmount = Math.max(2, oreDropMax * 2);
 							if (config.hasKey(category, "crushed")) {
@@ -559,6 +655,12 @@ public class configHandler {
 							}
 							if (config.hasKey(category, "crushedAmount")) {
 								crushedAmount = config.get(category, "crushedAmount", crushedAmount).getInt();
+							}
+							if (config.hasKey(category, "crushedType")) {
+								crushedType = config.get(category, "crushedType", "crushed").getString();
+							}
+							if (config.hasKey(category, "crushedOreDictList")) {
+								crushedOreDictList = config.get(category, "crushedOreDictList", "").getString();
 							}
 							if (config.hasKey(category, "crushedRenderType")) {
 								crushedRenderType = config.get(category, "crushedRenderType", 0).getInt();
@@ -574,12 +676,20 @@ public class configHandler {
 							int crushedPurifiedBurnTime = 0;
 							int crushedPurifiedColor = -1;
 							String crushedPurifiedName = "";
+							String crushedPurifiedType = "crushedPurified";
+							String crushedPurifiedOreDictList = "";
 							int crushedPurifiedMeta = -1;
 							if (config.hasKey(category, "crushedPurified")) {
 								crushedPurifiedName = config.get(category, "crushedPurified", "").getString();
 							}
 							if (config.hasKey(category, "crushedPurifiedMeta")) {
 								crushedPurifiedMeta = config.get(category, "crushedPurifiedMeta", -1).getInt();
+							}
+							if (config.hasKey(category, "crushedPurifiedType")) {
+								crushedPurifiedType = config.get(category, "crushedPurifiedType", "crushedPurified").getString();
+							}
+							if (config.hasKey(category, "crushedPurifiedOreDictList")) {
+								crushedPurifiedOreDictList = config.get(category, "crushedPurifiedOreDictList", "").getString();
 							}
 							if (config.hasKey(category, "crushedPurifiedRenderType")) {
 								crushedPurifiedRenderType = config.get(category, "crushedPurifiedRenderType", 0).getInt();
@@ -596,16 +706,36 @@ public class configHandler {
 									Boolean oreFound = false;
 									for (ItemStack oreDictOre : OreDictionary.getOres(ore.oreDictName)) {
 										if (Recipes.macerator.getOutputFor(oreDictOre, true) == null) {
-											//oreFound = oreDictOre;
+											// oreFound = oreDictOre;
 											break;
 										}
 									}
-									if (Recipes.macerator.getOutputFor(new ItemStack(ore,1), true) == null) {
-										ore.setCrushed(crushedMeta < 0 ? crushedName : crushedName + ":" + crushedMeta, new Crushed(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedRenderType, crushedBurnTime), crushedForce);
+									if (Recipes.macerator.getOutputFor(new ItemStack(ore, 1), true) == null) {
+										ItemStack crushed = Utils.getItemStack(crushedMeta < 0 ? crushedName : crushedName + ":" + crushedMeta, 1);
+										if (!crushedForce && crushed != null)
+											ore.setCrushed(crushed);
+										else {
+											crushedOreDictList = (crushedOreDictList.isEmpty() ? crushedType : crushedOreDictList);
+											List<String> crushedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedOreDictList.split("\\s*,\\s*")));
+											;
+											ATOCrushed ATOCrushed = new ATOCrushed(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedType, crushedOreDictListArray, crushedRenderType, crushedBurnTime);
+											Reference.CRUSHED_LIST.add(ATOCrushed);
+											ore.setCrushed(new ItemStack(ATOCrushed));
+										}
 									}
 									// Register Crushed Purified Ore
 									if (Recipes.oreWashing.getOutputFor(ore.getCrushed(1), true) == null) {
-										ore.setCrushedPurified(crushedPurifiedMeta < 0 ? crushedPurifiedName : crushedPurifiedName + ":" + crushedPurifiedMeta, new CrushedPurified(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedRenderType, crushedBurnTime), crushedPurifiedForce);
+										ItemStack crushedPurified = Utils.getItemStack(crushedPurifiedMeta < 0 ? crushedPurifiedName : crushedPurifiedName + ":" + crushedPurifiedMeta, 1);
+										if (!crushedPurifiedForce && crushedPurified != null)
+											ore.setCrushedPurified(crushedPurified);
+										else {
+											crushedPurifiedOreDictList = (crushedPurifiedOreDictList.isEmpty() ? crushedPurifiedType : crushedPurifiedOreDictList);
+											List<String> crushedPurifiedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedPurifiedOreDictList.split("\\s*,\\s*")));
+											;
+											ATOCrushedPurified ATOCrushedPurified = new ATOCrushedPurified(oreName, ore, (crushedPurifiedColor < 0) ? oreColor : crushedPurifiedColor, crushedPurifiedType, crushedPurifiedOreDictListArray, crushedPurifiedRenderType, crushedPurifiedBurnTime);
+											Reference.CRUSHEDPURIFIED_LIST.add(ATOCrushedPurified);
+											ore.setCrushedPurified(new ItemStack(ATOCrushedPurified));
+										}
 									}
 								}
 							}
@@ -633,7 +763,14 @@ public class configHandler {
 							}
 							// Register Block
 							if ((blockEnable && (oreType.equals("")))) {
-								ore.setBlock(blockMeta < 0 ? blockName : blockName + ":" + blockMeta, new ATOBlock(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : blockColor, blockRenderType), blockForce);
+								ItemStack block = Utils.getItemStack(blockMeta < 0 ? blockName : blockName + ":" + blockMeta, 1);
+								if (!blockForce && block != null)
+									ore.setBlock(block);
+								else {
+									ATOBlock ATOBlock = new ATOBlock(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : blockColor, blockRenderType, blockBurnTime);
+									Reference.BLOCK_LIST.add(ATOBlock);
+									ore.setBlock(new ItemStack(ATOBlock));
+								}
 							}
 
 							// Section: Brick setup
@@ -659,7 +796,14 @@ public class configHandler {
 							}
 							// Register Brick
 							if ((brickEnable && (oreType.equals("")))) {
-								ore.setBrick(brickMeta < 0 ? brickName : brickName + ":" + brickMeta, new ATOBrick(oreName, ore, (brickColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : brickColor, brickRenderType), brickForce);
+								ItemStack brick = Utils.getItemStack(brickMeta < 0 ? brickName : brickName + ":" + brickMeta, 1);
+								if (!brickForce && brick != null)
+									ore.setBlock(brick);
+								else {
+									ATOBrick ATOBrick = new ATOBrick(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : brickColor, brickRenderType, brickBurnTime);
+									Reference.BRICK_LIST.add(ATOBrick);
+									ore.setBrick(new ItemStack(ATOBrick));
+								}
 							}
 
 							// Section: Weapons setup
@@ -696,166 +840,160 @@ public class configHandler {
 								ore.boots = new Armor(oreName + "_boots", armorRenderID, armorMaterial, 3, ore, (ingotColor < 0) ? oreColor : ingotColor, 0);
 							}
 
+							// Section: Recipes Setup
+							ore.blockRecipe = blockRecipeEnable;
+							ore.brickRecipe = brickRecipeEnable;
+							ore.ingotRecipe = ingotRecipeEnable;
+							ore.nuggetRecipe = nuggetRecipeEnable;
+							ore.dustRecipe = dustRecipeEnable;
+							ore.dustTinyRecipe = dustTinyRecipeEnable;
+							ore.weaponRecipe = weaponRecipeEnable;
+							ore.toolsRecipe = toolsRecipeEnable;
+							ore.armorRecipe = armorRecipeEnable;
+
 							// Section: Register Ores
 							if (underlyingBlockName.equalsIgnoreCase("netherrack") || underlyingBlockName.equalsIgnoreCase("minecraft:netherrack")) {
-								NETHERORES_LIST.add(ore);
-								// Register Dense Nether Ore
-								if (Reference.CONFIG_GENERATE_DENSENETHER_ORES) {
-									// Match ore outputs with dense nether ore
-									// outputs
-									ATOOre oreSpecial = new ATOOre("nether_" + oreName, ore, "densenether", "minecraft:netherrack");
-									DENSENETHERORES_LIST.add(oreSpecial);
-								}
-								// Register Poor Nether Ore
-								if (Reference.CONFIG_GENERATE_POORNETHER_ORES) {
-									// Match ore outputs with poor nether ore
-									// outputs
-									ATOOre oreSpecial = new ATOOre("nether_" + oreName, ore, "poornether", "minecraft:netherrack");
-									POORNETHERORES_LIST.add(oreSpecial);
-								}
-								if (Reference.CONFIG_GENERATE_END_ORES) {
-									ATOOre oreSpecial = new ATOOre("end_" + oreName, ore, "end", "minecraft:end_stone");
-									ENDORES_LIST.add(oreSpecial);
-									// Register Dense End Ore
-									if (Reference.CONFIG_GENERATE_DENSEEND_ORES) {
-										// Match ore outputs with dense end ore
-										// outputs
-										oreSpecial = new ATOOre("end_" + oreName, ore, "denseend", "minecraft:end_stone");
-										DENSEENDORES_LIST.add(oreSpecial);
-									}
-									// Register Poor End Ore
-									if (Reference.CONFIG_GENERATE_POOREND_ORES) {
-										// Match ore outputs with poor end ore
-										// outputs
-										oreSpecial = new ATOOre("end_" + oreName, ore, "poorend", "minecraft:end_stone");
-										POORENDORES_LIST.add(oreSpecial);
-									}
-								}
-								// End Ores
-							} else if (underlyingBlockName.equalsIgnoreCase("end_stone") || underlyingBlockName.equalsIgnoreCase("minecraft:end_stone")) {
-								ATOOre oreSpecial = new ATOOre("end_" + oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, "endend", "minecraft:end_stone", veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust);
-								ENDORES_LIST.add(oreSpecial);
-								// Register Dense End Ore
-								if (Reference.CONFIG_GENERATE_DENSEEND_ORES) {
-									// Match ore outputs with dense end ore
-									// outputs
-									oreSpecial = new ATOOre("end_" + oreName, oreSpecial, "denseend", "minecraft:end_stone");
-									DENSEENDORES_LIST.add(oreSpecial);
-								}
-								// Register Poor End Ore
-								if (Reference.CONFIG_GENERATE_POOREND_ORES) {
-									// Match ore outputs with poor end ore
-									// outputs
-									oreSpecial = new ATOOre("end_" + oreName, oreSpecial, "poorend", "minecraft:end_stone");
-									POORENDORES_LIST.add(oreSpecial);
-								}
-								// Special Ores
-							} else if (underlyingBlock == Blocks.stone) {
-								ore.setSmeltingOutput(smeltName, new ItemStack(ore.ingot));
-								ORES_LIST.add(ore);
-								// Register Dense Ore
-								if (Reference.CONFIG_GENERATE_DENSE_ORES) {
-									// Match ore outputs with dense ore outputs
-									ATOOre oreSpecial = new ATOOre(oreName, ore, "dense", "minecraft:stone");
-									DENSEORES_LIST.add(oreSpecial);
-								}
-								// Register Poor Ore
-								if (Reference.CONFIG_GENERATE_POOR_ORES) {
-									// Match ore outputs with poor ore outputs
-									ATOOre oreSpecial = new ATOOre(oreName, ore, "poor", "minecraft:stone");
-									POORORES_LIST.add(oreSpecial);
-								}
-								// Register Gravel Ore
-								if (Reference.CONFIG_GENERATE_GRAVEL_ORES) {
-									// Match ore outputs with gravel ore outputs
-									ATOOre oreSpecial = new ATOOre(oreName + "__gravel", ore, "gravel", "minecraft:gravel");
-									oreSpecial.falls = true;
-									GRAVELORES_LIST.add(oreSpecial);
-									// Register Dense Gravel Ore
-									if (Reference.CONFIG_GENERATE_DENSEGRAVEL_ORES) {
-										// Match ore outputs with dense ore
-										// outputs
-										oreSpecial = new ATOOre(oreName + "__gravel", ore, "densegravel", "minecraft:gravel");
-										oreSpecial.falls = true;
-										DENSEGRAVELORES_LIST.add(oreSpecial);
-									}
-									// Register Poor Gravel Ore
-									if (Reference.CONFIG_GENERATE_POORGRAVEL_ORES) {
-										// Match ore outputs with poor gravel
-										// ore
-										// outputs
-										oreSpecial = new ATOOre(oreName + "__gravel", ore, "poorgravel", "minecraft:gravel");
-										oreSpecial.falls = true;
-										POORGRAVELORES_LIST.add(oreSpecial);
-									}
-								}
-								// Register Sand Ore
-								if (Reference.CONFIG_GENERATE_SAND_ORES) {
-									// Match ore outputs with sand ore outputs
-									ATOOre oreSpecial = new ATOOre(oreName + "__sand", ore, "sand", "minecraft:sand");
-									oreSpecial.falls = true;
-									SANDORES_LIST.add(oreSpecial);
-									// Register Dense Sand Ore
-									if (Reference.CONFIG_GENERATE_DENSESAND_ORES) {
-										// Match ore outputs with dense ore
-										// outputs
-										oreSpecial = new ATOOre(oreName + "__sand", ore, "densesand", "minecraft:sand");
-										oreSpecial.falls = true;
-										DENSESANDORES_LIST.add(oreSpecial);
-									}
-									// Register Poor Sand Ore
-									if (Reference.CONFIG_GENERATE_POORSAND_ORES) {
-										// Match ore outputs with poor sand ore
-										// outputs
-										oreSpecial = new ATOOre(oreName + "__sand", ore, "poorsand", "minecraft:sand");
-										oreSpecial.falls = true;
-										POORSANDORES_LIST.add(oreSpecial);
-									}
-								}
 								// Register Nether Ore
-								if (Reference.CONFIG_GENERATE_NETHER_ORES) {
-									// Match ore outputs with nether ore outputs
+								if (oreNetherEnable) {
 									ATOOre oreSpecial = new ATOOre("nether_" + oreName, ore, "nether", "minecraft:netherrack");
-									NETHERORES_LIST.add(oreSpecial);
+									NETHERORES_LIST.add(ore);
 									// Register Dense Nether Ore
-									if (Reference.CONFIG_GENERATE_DENSENETHER_ORES) {
-										// Match ore outputs with dense nether
-										// ore
+									if (Reference.CONFIG_GENERATE_DENSENETHER_ORES && oreDenseNetherEnable) {
+										// Match ore outputs with dense nether ore
 										// outputs
 										oreSpecial = new ATOOre("nether_" + oreName, ore, "densenether", "minecraft:netherrack");
 										DENSENETHERORES_LIST.add(oreSpecial);
 									}
 									// Register Poor Nether Ore
-									if (Reference.CONFIG_GENERATE_POORNETHER_ORES) {
-										// Match ore outputs with poor nether
-										// ore
+									if (Reference.CONFIG_GENERATE_POORNETHER_ORES && orePoorNetherEnable) {
+										// Match ore outputs with poor nether ore
 										// outputs
 										oreSpecial = new ATOOre("nether_" + oreName, ore, "poornether", "minecraft:netherrack");
 										POORNETHERORES_LIST.add(oreSpecial);
 									}
+									if (Reference.CONFIG_GENERATE_END_ORES && oreEndEnable) {
+										oreSpecial = new ATOOre("end_" + oreName, ore, "end", "minecraft:end_stone");
+										ENDORES_LIST.add(oreSpecial);
+										// Register Dense End Ore
+										if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
+											// Match ore outputs with dense end ore
+											// outputs
+											oreSpecial = new ATOOre("end_" + oreName, ore, "denseend", "minecraft:end_stone");
+											DENSEENDORES_LIST.add(oreSpecial);
+										}
+										// Register Poor End Ore
+										if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
+											// Match ore outputs with poor end ore
+											// outputs
+											oreSpecial = new ATOOre("end_" + oreName, ore, "poorend", "minecraft:end_stone");
+											POORENDORES_LIST.add(oreSpecial);
+										}
+									}
 								}
-								// Register End Ore
-								if (Reference.CONFIG_GENERATE_END_ORES) {
-									// Match ore outputs with end ore outputs
-									ATOOre oreSpecial = new ATOOre("end_" + oreName, ore, "end", "minecraft:end_stone");
+							} else if (underlyingBlockName.equalsIgnoreCase("end_stone") || underlyingBlockName.equalsIgnoreCase("minecraft:end_stone")) {
+								// Register End Ores
+								if (oreEndEnable) {
+									ATOOre oreSpecial = new ATOOre("end_" + oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, "endend", "minecraft:end_stone", veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust);
 									ENDORES_LIST.add(oreSpecial);
 									// Register Dense End Ore
-									if (Reference.CONFIG_GENERATE_DENSEEND_ORES) {
+									if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
 										// Match ore outputs with dense end ore
 										// outputs
-										oreSpecial = new ATOOre("end_" + oreName, ore, "denseend", "minecraft:end_stone");
+										oreSpecial = new ATOOre("end_" + oreName, oreSpecial, "denseend", "minecraft:end_stone");
 										DENSEENDORES_LIST.add(oreSpecial);
 									}
 									// Register Poor End Ore
-									if (Reference.CONFIG_GENERATE_POOREND_ORES) {
+									if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
 										// Match ore outputs with poor end ore
 										// outputs
+										oreSpecial = new ATOOre("end_" + oreName, oreSpecial, "poorend", "minecraft:end_stone");
+										POORENDORES_LIST.add(oreSpecial);
+									}
+								}
+							} else if (underlyingBlock == Blocks.stone) {
+								// Base Ore
+								if (Reference.CONFIG_GENERATE_DENSE_ORES && oreBaseEnable) {
+									ORES_LIST.add(ore);
+									// Register Dense Ore
+									if (Reference.CONFIG_GENERATE_DENSE_ORES && oreDenseEnable) {
+										// Match ore outputs with dense ore outputs
+										ATOOre oreSpecial = new ATOOre(oreName, ore, "dense", "minecraft:stone");
+										DENSEORES_LIST.add(oreSpecial);
+									}
+									// Register Poor Ore
+									if (Reference.CONFIG_GENERATE_POOR_ORES && orePoorEnable) {
+										// Match ore outputs with poor ore outputs
+										ATOOre oreSpecial = new ATOOre(oreName, ore, "poor", "minecraft:stone");
+										POORORES_LIST.add(oreSpecial);
+									}
+								}
+								if (Reference.CONFIG_GENERATE_GRAVEL_ORES && oreGravelEnable) {
+									// Register Gravel Ores
+									ATOOre oreSpecial = new ATOOre(oreName + "__gravel", ore, "gravel", "minecraft:gravel");
+									oreSpecial.falls = true;
+									GRAVELORES_LIST.add(oreSpecial);
+									if (Reference.CONFIG_GENERATE_DENSEGRAVEL_ORES && oreDenseGravelEnable) {
+										// Register Dense Gravel Ore
+										oreSpecial = new ATOOre(oreName + "__gravel", ore, "densegravel", "minecraft:gravel");
+										oreSpecial.falls = true;
+										DENSEGRAVELORES_LIST.add(oreSpecial);
+									}
+									if (Reference.CONFIG_GENERATE_POORGRAVEL_ORES && orePoorGravelEnable) {
+										// Register Poor Gravel Ore
+										oreSpecial = new ATOOre(oreName + "__gravel", ore, "poorgravel", "minecraft:gravel");
+										oreSpecial.falls = true;
+										POORGRAVELORES_LIST.add(oreSpecial);
+									}
+								}
+								if (Reference.CONFIG_GENERATE_SAND_ORES && oreSandEnable) {
+									// Register Sand Ore
+									ATOOre oreSpecial = new ATOOre(oreName + "__sand", ore, "sand", "minecraft:sand");
+									oreSpecial.falls = true;
+									SANDORES_LIST.add(oreSpecial);
+									if (Reference.CONFIG_GENERATE_DENSESAND_ORES && oreDenseSandEnable) {
+										// Register Dense Sand Ore
+										oreSpecial = new ATOOre(oreName + "__sand", ore, "densesand", "minecraft:sand");
+										oreSpecial.falls = true;
+										DENSESANDORES_LIST.add(oreSpecial);
+									}
+									if (Reference.CONFIG_GENERATE_POORSAND_ORES && orePoorSandEnable) {
+										// Register Poor Sand Ore
+										oreSpecial = new ATOOre(oreName + "__sand", ore, "poorsand", "minecraft:sand");
+										oreSpecial.falls = true;
+										POORSANDORES_LIST.add(oreSpecial);
+									}
+								}
+								if (Reference.CONFIG_GENERATE_NETHER_ORES && oreNetherEnable) {
+									// Register Nether Ore
+									ATOOre oreSpecial = new ATOOre("nether_" + oreName, ore, "nether", "minecraft:netherrack");
+									NETHERORES_LIST.add(oreSpecial);
+									if (Reference.CONFIG_GENERATE_DENSENETHER_ORES && oreDenseNetherEnable) {
+										// Register Dense Nether Ore
+										oreSpecial = new ATOOre("nether_" + oreName, ore, "densenether", "minecraft:netherrack");
+										DENSENETHERORES_LIST.add(oreSpecial);
+									}
+									if (Reference.CONFIG_GENERATE_POORNETHER_ORES && orePoorNetherEnable) {
+										// Register Poor Nether Ore
+										oreSpecial = new ATOOre("nether_" + oreName, ore, "poornether", "minecraft:netherrack");
+										POORNETHERORES_LIST.add(oreSpecial);
+									}
+								}
+								if (Reference.CONFIG_GENERATE_END_ORES && oreEndEnable) {
+									// Register End Ore
+									ATOOre oreSpecial = new ATOOre("end_" + oreName, ore, "end", "minecraft:end_stone");
+									ENDORES_LIST.add(oreSpecial);
+									if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
+										// Register Dense End Ore
+										oreSpecial = new ATOOre("end_" + oreName, ore, "denseend", "minecraft:end_stone");
+										DENSEENDORES_LIST.add(oreSpecial);
+									}
+									if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
+										// Register Poor End Ore
 										oreSpecial = new ATOOre("end_" + oreName, ore, "poorend", "minecraft:end_stone");
 										POORENDORES_LIST.add(oreSpecial);
 									}
 								}
 							} else {
-								ore.setSmeltingOutput(smeltName, new ItemStack(ore.ingot));
 								ORES_LIST.add(ore);
 							}
 						} else {
@@ -933,7 +1071,7 @@ public class configHandler {
 			for (String s : oreDict) {
 				if (s.startsWith("ore") && (!s.startsWith("orePoor")) && (!s.startsWith("oreDense")) && (!s.startsWith("poorore")) && (!s.startsWith("denseore"))) {
 					String name = s.substring(3);
-					String sname = getSpecialName(name);
+					String sname = Utils.getSpecialName(name);
 					String iname = "";
 					LogHelper.mod_debug("ore = " + s);
 					LogHelper.mod_debug("name = " + name);
