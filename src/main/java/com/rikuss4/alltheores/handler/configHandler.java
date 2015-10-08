@@ -52,24 +52,32 @@ public class configHandler {
 	private static int oreRenderType;
 	private static String underlyingBlock;
 	private static String modID;
-
+	static LinkedList<ATOOre> POORORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> ORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> DENSEORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> POORSANDORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> SANDORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> DENSESANDORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> POORGRAVELORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> GRAVELORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> DENSEGRAVELORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> POORNETHERORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> NETHERORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> DENSENETHERORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> POORENDORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> ENDORES_LIST = new LinkedList<ATOOre>();
+	static LinkedList<ATOOre> DENSEENDORES_LIST = new LinkedList<ATOOre>();
+	static ATODust ATODust = null; 
+	static ATODustTiny ATODustTiny = null;
+	static ATONugget ATONugget = null;
+	static ATOIngot ATOIngot = null;
+	static ATOCrushed ATOCrushed = null;
+	static ATOCrushedPurified ATOCrushedPurified = null;
+	static ATOBlock ATOBlock = null;
+	static ATOBrick ATOBrick = null;
+			
 	public static void preInit(Path configDir) {
 		Configuration config = new Configuration(Paths.get(configDir.toString() + "/core.cfg").toFile());
-		LinkedList<ATOOre> POORORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> ORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> DENSEORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> POORSANDORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> SANDORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> DENSESANDORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> POORGRAVELORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> GRAVELORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> DENSEGRAVELORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> POORNETHERORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> NETHERORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> DENSENETHERORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> POORENDORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> ENDORES_LIST = new LinkedList<ATOOre>();
-		LinkedList<ATOOre> DENSEENDORES_LIST = new LinkedList<ATOOre>();
 
 		// Global Enable/Disable
 		Reference.CONFIG_ADD_SMELTING = config.getBoolean("add_smelting", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for smelting");
@@ -81,7 +89,8 @@ public class configHandler {
 		Reference.CONFIG_ADD_CRAFTING_TOOL = config.getBoolean("add_crafting_tool", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting tools");
 		Reference.CONFIG_ADD_CRAFTING_ARMOR = config.getBoolean("add_crafting_armor", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting armor");
 		Reference.CONFIG_GENERATE_ORES_CONFIG = config.getBoolean("generate_starter_ores", Configuration.CATEGORY_GENERAL, false, "Enable/Disable generating All.cfg of ores for starting point");
-		Reference.CONFIG_GENERATE_NETHER_ORES = config.getBoolean("generate_nether_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating nether ores from base ores");
+		Reference.CONFIG_GENERATE_NETHER_ORES = config.getBoolean("generate_nether_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating nether ores");
+		Reference.CONFIG_GENERATE_END_ORES = config.getBoolean("generate_end_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating end ores");
 		Reference.CONFIG_GENERATE_POOR_ORES = config.getBoolean("generate_poor_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating poor ores from base ores");
 		Reference.CONFIG_GENERATE_DENSE_ORES = config.getBoolean("generate_dense_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating dense ores from base ores");
 		Reference.CONFIG_GENERATE_SAND_ORES = config.getBoolean("generate_sand_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating sand ores from base ores");
@@ -123,6 +132,7 @@ public class configHandler {
 						String underlyingBlockName = config.get(category, "underlyingBlock", "minecraft:stone").getString();
 						Block underlyingBlock = Block.getBlockFromName(underlyingBlockName);
 						if (underlyingBlock != null) {
+							
 							// Enabling/Disabling section
 							boolean toolsEnable = false;
 							boolean weaponsEnable = false;
@@ -450,12 +460,30 @@ public class configHandler {
 							if (config.hasKey(category, "extraDustTinyMeta")) {
 								extraDustTinyMeta = config.get(category, "extraDustTinyMeta", -1).getInt();
 							}
-
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
 							// Section: Register Ore
-							ATOOre ore = new ATOOre(oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, oreType, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust, null);
+							ATOOre ore = new ATOOre(oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, oreType, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust, true, null);
 							ore.oreDenseRenderType = (oreDenseRenderType < 0) ? oreRenderType : oreDenseRenderType;
 							ore.orePoorRenderType = (orePoorRenderType < 0) ? oreRenderType : orePoorRenderType;
-
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
 							// Section: Ingot setup
 							String ingotName = "";
 							String ingotType = "ingot";
@@ -494,8 +522,7 @@ public class configHandler {
 									LogHelper.mod_debug(oreName + " Ingot: " + ingot.getUnlocalizedName());
 									ore.setIngot(ingot);
 								} else {
-									ATOIngot ATOIngot = new ATOIngot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime);
-									Reference.INGOT_LIST.add(ATOIngot);
+									ATOIngot = new ATOIngot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime);
 									ore.setIngot(new ItemStack(ATOIngot));
 									LogHelper.mod_debug(oreName + " Ingot: " + ore.getIngot().getUnlocalizedName());
 								}
@@ -539,8 +566,7 @@ public class configHandler {
 								if (!nuggetForce && nugget != null)
 									ore.setNugget(nugget);
 								else {
-									ATONugget ATONugget = new ATONugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetOreDictListArray, nuggetRenderType, nuggetBurnTime);
-									Reference.NUGGET_LIST.add(ATONugget);
+									ATONugget = new ATONugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetOreDictListArray, nuggetRenderType, nuggetBurnTime);
 									ore.setNugget(new ItemStack(ATONugget));
 								}
 							}
@@ -587,8 +613,7 @@ public class configHandler {
 								if (!dustForce && dust != null)
 									ore.setDust(dust);
 								else {
-									ATODust ATODust = new ATODust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustType, dustOreDictListArray, dustRenderType, dustBurnTime);
-									Reference.DUST_LIST.add(ATODust);
+									ATODust = new ATODust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustType, dustOreDictListArray, dustRenderType, dustBurnTime);
 									ore.setDust(new ItemStack(ATODust));
 								}
 							}
@@ -632,8 +657,7 @@ public class configHandler {
 								if (!dustTinyForce && dustTiny != null)
 									ore.setDustTiny(dustTiny);
 								else {
-									ATODustTiny ATODustTiny = new ATODustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyType, dustTinyOreDictListArray, dustTinyRenderType, dustTinyBurnTime);
-									Reference.DUSTTINY_LIST.add(ATODustTiny);
+									ATODustTiny = new ATODustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyType, dustTinyOreDictListArray, dustTinyRenderType, dustTinyBurnTime);
 									ore.setDustTiny(new ItemStack(ATODustTiny));
 								}
 							}
@@ -718,8 +742,7 @@ public class configHandler {
 											crushedOreDictList = (crushedOreDictList.isEmpty() ? crushedType : crushedOreDictList);
 											List<String> crushedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedOreDictList.split("\\s*,\\s*")));
 											;
-											ATOCrushed ATOCrushed = new ATOCrushed(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedType, crushedOreDictListArray, crushedRenderType, crushedBurnTime);
-											Reference.CRUSHED_LIST.add(ATOCrushed);
+											ATOCrushed = new ATOCrushed(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedType, crushedOreDictListArray, crushedRenderType, crushedBurnTime);
 											ore.setCrushed(new ItemStack(ATOCrushed));
 										}
 									}
@@ -731,9 +754,7 @@ public class configHandler {
 										else {
 											crushedPurifiedOreDictList = (crushedPurifiedOreDictList.isEmpty() ? crushedPurifiedType : crushedPurifiedOreDictList);
 											List<String> crushedPurifiedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedPurifiedOreDictList.split("\\s*,\\s*")));
-											;
-											ATOCrushedPurified ATOCrushedPurified = new ATOCrushedPurified(oreName, ore, (crushedPurifiedColor < 0) ? oreColor : crushedPurifiedColor, crushedPurifiedType, crushedPurifiedOreDictListArray, crushedPurifiedRenderType, crushedPurifiedBurnTime);
-											Reference.CRUSHEDPURIFIED_LIST.add(ATOCrushedPurified);
+											ATOCrushedPurified = new ATOCrushedPurified(oreName, ore, (crushedPurifiedColor < 0) ? oreColor : crushedPurifiedColor, crushedPurifiedType, crushedPurifiedOreDictListArray, crushedPurifiedRenderType, crushedPurifiedBurnTime);
 											ore.setCrushedPurified(new ItemStack(ATOCrushedPurified));
 										}
 									}
@@ -767,8 +788,7 @@ public class configHandler {
 								if (!blockForce && block != null)
 									ore.setBlock(block);
 								else {
-									ATOBlock ATOBlock = new ATOBlock(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : blockColor, blockRenderType, blockBurnTime);
-									Reference.BLOCK_LIST.add(ATOBlock);
+									ATOBlock = new ATOBlock(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : blockColor, blockRenderType, blockBurnTime);
 									ore.setBlock(new ItemStack(ATOBlock));
 								}
 							}
@@ -800,8 +820,7 @@ public class configHandler {
 								if (!brickForce && brick != null)
 									ore.setBlock(brick);
 								else {
-									ATOBrick ATOBrick = new ATOBrick(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : brickColor, brickRenderType, brickBurnTime);
-									Reference.BRICK_LIST.add(ATOBrick);
+									ATOBrick = new ATOBrick(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : brickColor, brickRenderType, brickBurnTime);
 									ore.setBrick(new ItemStack(ATOBrick));
 								}
 							}
@@ -852,150 +871,37 @@ public class configHandler {
 							ore.armorRecipe = armorRecipeEnable;
 
 							// Section: Register Ores
-							if (underlyingBlockName.equalsIgnoreCase("netherrack") || underlyingBlockName.equalsIgnoreCase("minecraft:netherrack")) {
-								// Register Nether Ore
-								if (oreNetherEnable) {
-									ATOOre oreSpecial = new ATOOre("nether_" + oreName, ore, "nether", "minecraft:netherrack");
-									NETHERORES_LIST.add(ore);
-									// Register Dense Nether Ore
-									if (Reference.CONFIG_GENERATE_DENSENETHER_ORES && oreDenseNetherEnable) {
-										// Match ore outputs with dense nether ore
-										// outputs
-										oreSpecial = new ATOOre("nether_" + oreName, ore, "densenether", "minecraft:netherrack");
-										DENSENETHERORES_LIST.add(oreSpecial);
-									}
-									// Register Poor Nether Ore
-									if (Reference.CONFIG_GENERATE_POORNETHER_ORES && orePoorNetherEnable) {
-										// Match ore outputs with poor nether ore
-										// outputs
-										oreSpecial = new ATOOre("nether_" + oreName, ore, "poornether", "minecraft:netherrack");
-										POORNETHERORES_LIST.add(oreSpecial);
-									}
-									if (Reference.CONFIG_GENERATE_END_ORES && oreEndEnable) {
-										oreSpecial = new ATOOre("end_" + oreName, ore, "end", "minecraft:end_stone");
-										ENDORES_LIST.add(oreSpecial);
-										// Register Dense End Ore
-										if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
-											// Match ore outputs with dense end ore
-											// outputs
-											oreSpecial = new ATOOre("end_" + oreName, ore, "denseend", "minecraft:end_stone");
-											DENSEENDORES_LIST.add(oreSpecial);
-										}
-										// Register Poor End Ore
-										if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
-											// Match ore outputs with poor end ore
-											// outputs
-											oreSpecial = new ATOOre("end_" + oreName, ore, "poorend", "minecraft:end_stone");
-											POORENDORES_LIST.add(oreSpecial);
-										}
-									}
-								}
-							} else if (underlyingBlockName.equalsIgnoreCase("end_stone") || underlyingBlockName.equalsIgnoreCase("minecraft:end_stone")) {
+							if (underlyingBlock == Blocks.end_stone) {
 								// Register End Ores
-								if (oreEndEnable) {
-									ATOOre oreSpecial = new ATOOre("end_" + oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, "endend", "minecraft:end_stone", veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust);
-									ENDORES_LIST.add(oreSpecial);
-									// Register Dense End Ore
-									if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
-										// Match ore outputs with dense end ore
-										// outputs
-										oreSpecial = new ATOOre("end_" + oreName, oreSpecial, "denseend", "minecraft:end_stone");
-										DENSEENDORES_LIST.add(oreSpecial);
-									}
-									// Register Poor End Ore
-									if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
-										// Match ore outputs with poor end ore
-										// outputs
-										oreSpecial = new ATOOre("end_" + oreName, oreSpecial, "poorend", "minecraft:end_stone");
-										POORENDORES_LIST.add(oreSpecial);
-									}
-								}
+								LogHelper.mod_debug("Creating End Ores.");
+								createEndOres(ore, oreEndEnable, oreDenseEndEnable, orePoorEndEnable, true);
+							} else if (underlyingBlock == Blocks.netherrack) {
+								// Register Nether & End Ores
+								LogHelper.mod_debug("Creating Nether Ores.");
+								createNetherOres(ore, oreNetherEnable, oreDenseNetherEnable, orePoorNetherEnable, true);
+								createEndOres(ore, oreEndEnable, oreDenseEndEnable, orePoorEndEnable, false);
 							} else if (underlyingBlock == Blocks.stone) {
 								// Base Ore
-								if (Reference.CONFIG_GENERATE_DENSE_ORES && oreBaseEnable) {
-									ORES_LIST.add(ore);
-									// Register Dense Ore
-									if (Reference.CONFIG_GENERATE_DENSE_ORES && oreDenseEnable) {
-										// Match ore outputs with dense ore outputs
-										ATOOre oreSpecial = new ATOOre(oreName, ore, "dense", "minecraft:stone");
-										DENSEORES_LIST.add(oreSpecial);
-									}
-									// Register Poor Ore
-									if (Reference.CONFIG_GENERATE_POOR_ORES && orePoorEnable) {
-										// Match ore outputs with poor ore outputs
-										ATOOre oreSpecial = new ATOOre(oreName, ore, "poor", "minecraft:stone");
-										POORORES_LIST.add(oreSpecial);
-									}
-								}
-								if (Reference.CONFIG_GENERATE_GRAVEL_ORES && oreGravelEnable) {
-									// Register Gravel Ores
-									ATOOre oreSpecial = new ATOOre(oreName + "__gravel", ore, "gravel", "minecraft:gravel");
-									oreSpecial.falls = true;
-									GRAVELORES_LIST.add(oreSpecial);
-									if (Reference.CONFIG_GENERATE_DENSEGRAVEL_ORES && oreDenseGravelEnable) {
-										// Register Dense Gravel Ore
-										oreSpecial = new ATOOre(oreName + "__gravel", ore, "densegravel", "minecraft:gravel");
-										oreSpecial.falls = true;
-										DENSEGRAVELORES_LIST.add(oreSpecial);
-									}
-									if (Reference.CONFIG_GENERATE_POORGRAVEL_ORES && orePoorGravelEnable) {
-										// Register Poor Gravel Ore
-										oreSpecial = new ATOOre(oreName + "__gravel", ore, "poorgravel", "minecraft:gravel");
-										oreSpecial.falls = true;
-										POORGRAVELORES_LIST.add(oreSpecial);
-									}
-								}
-								if (Reference.CONFIG_GENERATE_SAND_ORES && oreSandEnable) {
-									// Register Sand Ore
-									ATOOre oreSpecial = new ATOOre(oreName + "__sand", ore, "sand", "minecraft:sand");
-									oreSpecial.falls = true;
-									SANDORES_LIST.add(oreSpecial);
-									if (Reference.CONFIG_GENERATE_DENSESAND_ORES && oreDenseSandEnable) {
-										// Register Dense Sand Ore
-										oreSpecial = new ATOOre(oreName + "__sand", ore, "densesand", "minecraft:sand");
-										oreSpecial.falls = true;
-										DENSESANDORES_LIST.add(oreSpecial);
-									}
-									if (Reference.CONFIG_GENERATE_POORSAND_ORES && orePoorSandEnable) {
-										// Register Poor Sand Ore
-										oreSpecial = new ATOOre(oreName + "__sand", ore, "poorsand", "minecraft:sand");
-										oreSpecial.falls = true;
-										POORSANDORES_LIST.add(oreSpecial);
-									}
-								}
-								if (Reference.CONFIG_GENERATE_NETHER_ORES && oreNetherEnable) {
-									// Register Nether Ore
-									ATOOre oreSpecial = new ATOOre("nether_" + oreName, ore, "nether", "minecraft:netherrack");
-									NETHERORES_LIST.add(oreSpecial);
-									if (Reference.CONFIG_GENERATE_DENSENETHER_ORES && oreDenseNetherEnable) {
-										// Register Dense Nether Ore
-										oreSpecial = new ATOOre("nether_" + oreName, ore, "densenether", "minecraft:netherrack");
-										DENSENETHERORES_LIST.add(oreSpecial);
-									}
-									if (Reference.CONFIG_GENERATE_POORNETHER_ORES && orePoorNetherEnable) {
-										// Register Poor Nether Ore
-										oreSpecial = new ATOOre("nether_" + oreName, ore, "poornether", "minecraft:netherrack");
-										POORNETHERORES_LIST.add(oreSpecial);
-									}
-								}
-								if (Reference.CONFIG_GENERATE_END_ORES && oreEndEnable) {
-									// Register End Ore
-									ATOOre oreSpecial = new ATOOre("end_" + oreName, ore, "end", "minecraft:end_stone");
-									ENDORES_LIST.add(oreSpecial);
-									if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
-										// Register Dense End Ore
-										oreSpecial = new ATOOre("end_" + oreName, ore, "denseend", "minecraft:end_stone");
-										DENSEENDORES_LIST.add(oreSpecial);
-									}
-									if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
-										// Register Poor End Ore
-										oreSpecial = new ATOOre("end_" + oreName, ore, "poorend", "minecraft:end_stone");
-										POORENDORES_LIST.add(oreSpecial);
-									}
-								}
+								LogHelper.mod_debug("Creating All Ores.");
+								createBaseOres(ore, oreBaseEnable, oreDenseEnable, orePoorEnable);
+								createSandOres(ore, oreSandEnable, oreDenseSandEnable, orePoorSandEnable, false);
+								createGravelOres(ore, oreGravelEnable, oreDenseGravelEnable, orePoorGravelEnable, false);
+								createNetherOres(ore, oreNetherEnable, oreDenseNetherEnable, orePoorNetherEnable, false);
+								createEndOres(ore, oreEndEnable, oreDenseEndEnable, orePoorEndEnable, false);
 							} else {
 								ORES_LIST.add(ore);
 							}
+							
+							
+							//Resources
+							if (ATODust != null) Reference.DUST_LIST.add(ATODust);
+							if (ATODustTiny != null) Reference.DUSTTINY_LIST.add(ATODustTiny);
+							if (ATONugget != null) Reference.NUGGET_LIST.add(ATONugget);
+							if (ATOIngot != null) Reference.INGOT_LIST.add(ATOIngot);
+							if (ATOCrushed != null) Reference.CRUSHED_LIST.add(ATOCrushed);
+							if (ATOCrushedPurified != null) Reference.CRUSHEDPURIFIED_LIST.add(ATOCrushedPurified);
+							if (ATOBlock != null) Reference.BLOCK_LIST.add(ATOBlock);
+							if (ATOBrick != null) Reference.BRICK_LIST.add(ATOBrick);
 						} else {
 							LogHelper.warn(oreName + ": Underlying Block \"" + underlyingBlockName + "\" not found.");
 							LogHelper.warn(oreName + ": Ore will not be added.");
@@ -1030,7 +936,6 @@ public class configHandler {
 
 		// Add all special ores to ORES_LIST
 		Reference.ORES_LIST.addAll(ORES_LIST);
-		Reference.ORES_LIST.addAll(DENSEORES_LIST);
 		Reference.ORES_LIST.addAll(SANDORES_LIST);
 		Reference.ORES_LIST.addAll(GRAVELORES_LIST);
 		Reference.ORES_LIST.addAll(NETHERORES_LIST);
@@ -1040,10 +945,132 @@ public class configHandler {
 		Reference.ORES_LIST.addAll(POORGRAVELORES_LIST);
 		Reference.ORES_LIST.addAll(POORNETHERORES_LIST);
 		Reference.ORES_LIST.addAll(POORENDORES_LIST);
+		Reference.ORES_LIST.addAll(DENSEORES_LIST);
 		Reference.ORES_LIST.addAll(DENSENETHERORES_LIST);
 		Reference.ORES_LIST.addAll(DENSESANDORES_LIST);
 		Reference.ORES_LIST.addAll(DENSEGRAVELORES_LIST);
 		Reference.ORES_LIST.addAll(DENSEENDORES_LIST);
+	}
+
+	private static void createBaseOres(ATOOre ore, Boolean oreBaseEnable, Boolean oreDenseEnable, Boolean orePoorEnable) {
+		if (oreBaseEnable) {
+			ORES_LIST.add(ore);
+			// Register Dense Ore
+			if (Reference.CONFIG_GENERATE_DENSE_ORES && oreDenseEnable) {
+				// Match ore outputs with dense ore outputs
+				ATOOre oreSpecial = new ATOOre(ore.baseName, ore, "dense", "minecraft:stone", false);
+				DENSEORES_LIST.add(oreSpecial);
+			}
+			// Register Poor Ore
+			if (Reference.CONFIG_GENERATE_POOR_ORES && orePoorEnable) {
+				// Match ore outputs with poor ore outputs
+				ATOOre oreSpecial = new ATOOre(ore.baseName, ore, "poor", "minecraft:stone", false);
+				POORORES_LIST.add(oreSpecial);
+			}
+		}
+	}
+
+	private static void changeBaseOre(ATOOre ore) {
+		ATODust.setOre(ore);
+		ATODustTiny.setOre(ore);
+		ATONugget.setOre(ore);
+		ATOIngot.setOre(ore);
+		ATOCrushed.setOre(ore);
+		ATOCrushedPurified.setOre(ore);
+		ATOBlock.setOre(ore);
+		ATOBrick.setOre(ore);
+	}
+
+	private static void createSandOres(ATOOre ore, Boolean oreSandEnable, Boolean oreDenseSandEnable, Boolean orePoorSandEnable, boolean baseOre) {
+		if (Reference.CONFIG_GENERATE_SAND_ORES && oreSandEnable) {
+			// Register Sand Ore
+			ATOOre oreSpecial = new ATOOre(ore.baseName + "__sand", ore, "sand", "minecraft:sand", false);
+			oreSpecial.falls = true;
+			SANDORES_LIST.add(oreSpecial);
+			if(baseOre) 
+				changeBaseOre(oreSpecial);
+			if (Reference.CONFIG_GENERATE_DENSESAND_ORES && oreDenseSandEnable) {
+				// Register Dense Sand Ore
+				oreSpecial = new ATOOre(ore.baseName + "__sand", ore, "densesand", "minecraft:sand", false);
+				oreSpecial.falls = true;
+				DENSESANDORES_LIST.add(oreSpecial);
+			}
+			if (Reference.CONFIG_GENERATE_POORSAND_ORES && orePoorSandEnable) {
+				// Register Poor Sand Ore
+				oreSpecial = new ATOOre(ore.baseName + "__sand", ore, "poorsand", "minecraft:sand", false);
+				oreSpecial.falls = true;
+				POORSANDORES_LIST.add(oreSpecial);
+			}
+		}
+	}
+
+	private static void createGravelOres(ATOOre ore, Boolean oreGravelEnable, Boolean oreDenseGravelEnable, Boolean orePoorGravelEnable, boolean baseOre) {
+		if (Reference.CONFIG_GENERATE_GRAVEL_ORES && oreGravelEnable) {
+			// Register Gravel Ores
+			ATOOre oreSpecial = new ATOOre(ore.baseName + "__gravel", ore, "gravel", "minecraft:gravel", false);
+			oreSpecial.falls = true;
+			GRAVELORES_LIST.add(oreSpecial);
+			if(baseOre) 
+				changeBaseOre(oreSpecial);
+			if (Reference.CONFIG_GENERATE_DENSEGRAVEL_ORES && oreDenseGravelEnable) {
+				// Register Dense Gravel Ore
+				oreSpecial = new ATOOre(ore.baseName + "__gravel", ore, "densegravel", "minecraft:gravel", false);
+				oreSpecial.falls = true;
+				DENSEGRAVELORES_LIST.add(oreSpecial);
+			}
+			if (Reference.CONFIG_GENERATE_POORGRAVEL_ORES && orePoorGravelEnable) {
+				// Register Poor Gravel Ore
+				oreSpecial = new ATOOre(ore.baseName + "__gravel", ore, "poorgravel", "minecraft:gravel", false);
+				oreSpecial.falls = true;
+				POORGRAVELORES_LIST.add(oreSpecial);
+			}
+		}
+	}
+
+	private static void createNetherOres(ATOOre ore, Boolean oreNetherEnable, Boolean oreDenseNetherEnable, Boolean orePoorNetherEnable, Boolean baseOre) {
+		if ((Reference.CONFIG_GENERATE_NETHER_ORES && oreNetherEnable)) {
+			ATOOre oreSpecial = new ATOOre(ore.baseName + "__nether", ore, "nether", "minecraft:netherrack", baseOre);
+			NETHERORES_LIST.add(oreSpecial);
+			if(baseOre) 
+				changeBaseOre(oreSpecial);
+			// Register Dense Nether Ore
+			if (Reference.CONFIG_GENERATE_DENSENETHER_ORES && oreDenseNetherEnable) {
+				// Match ore outputs with dense nether ore
+				// outputs
+				oreSpecial = new ATOOre(ore.baseName + "__nether", ore, "densenether", "minecraft:netherrack", false);
+				DENSENETHERORES_LIST.add(oreSpecial);
+			}
+			// Register Poor Nether Ore
+			if (Reference.CONFIG_GENERATE_POORNETHER_ORES && orePoorNetherEnable) {
+				// Match ore outputs with poor nether ore
+				// outputs
+				oreSpecial = new ATOOre(ore.baseName + "__nether", ore, "poornether", "minecraft:netherrack", false);
+				POORNETHERORES_LIST.add(oreSpecial);
+			}
+		}
+	}
+
+	private static void createEndOres(ATOOre ore, Boolean oreEndEnable, Boolean oreDenseEndEnable, Boolean orePoorEndEnable, Boolean baseOre) {
+		if (Reference.CONFIG_GENERATE_END_ORES && oreEndEnable) {
+			ATOOre oreSpecial = new ATOOre(ore.baseName + "__end", ore, "end", "minecraft:end_stone", baseOre);
+			ENDORES_LIST.add(oreSpecial);
+			if(baseOre) 
+				changeBaseOre(oreSpecial);
+			// Register Dense End Ore
+			if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
+				// Match ore outputs with dense end ore
+				// outputs
+				oreSpecial = new ATOOre(ore.baseName + "__end", ore, "denseend", "minecraft:end_stone", false);
+				DENSEENDORES_LIST.add(oreSpecial);
+			}
+			// Register Poor End Ore
+			if (Reference.CONFIG_GENERATE_POOREND_ORES && orePoorEndEnable) {
+				// Match ore outputs with poor end ore
+				// outputs
+				oreSpecial = new ATOOre(ore.baseName + "__end", ore, "poorend", "minecraft:end_stone", false);
+				POORENDORES_LIST.add(oreSpecial);
+			}
+		}
 	}
 
 	private static LinkedList<ATOOre> sortOresList(LinkedList<ATOOre> ORES_LIST) {

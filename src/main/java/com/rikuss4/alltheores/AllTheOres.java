@@ -8,8 +8,8 @@ import net.minecraftforge.common.MinecraftForge;
 import com.rikuss4.alltheores.handler.configHandler;
 import com.rikuss4.alltheores.handler.disableVanillaOreHandler;
 import com.rikuss4.alltheores.handler.fuelHandler;
-import com.rikuss4.alltheores.init.Blocks;
-import com.rikuss4.alltheores.init.Items;
+import com.rikuss4.alltheores.init.ATOBlocks;
+import com.rikuss4.alltheores.init.ATOItems;
 import com.rikuss4.alltheores.items.ATOLogo;
 import com.rikuss4.alltheores.reference.Reference;
 import com.rikuss4.alltheores.utility.ImageUtils;
@@ -42,8 +42,8 @@ public class AllTheOres {
 		ATOLogo ATOLogo = new ATOLogo();
 		// GameRegistry.registerItem(ATOLogo, ATOLogo.getUnlocalizedName().substring(5));
 
-		Blocks.preInit(e);
-		Items.preInit();
+		ATOBlocks.preInit(e);
+		ATOItems.preInit();
 
 		MinecraftForge.ORE_GEN_BUS.register(new disableVanillaOreHandler());
 		GameRegistry.registerWorldGenerator(new Generator(), 16);
@@ -52,13 +52,13 @@ public class AllTheOres {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent e) {
-		Blocks.init();
-		Items.init();
+		ATOBlocks.init();
+		ATOItems.init();
 	}
 
 	@Mod.EventHandler
 	public void postInit(FMLInitializationEvent e) {
-		Blocks.postInit();
-		Items.postInit();
+		ATOBlocks.postInit();
+		ATOItems.postInit();
 	}
 }

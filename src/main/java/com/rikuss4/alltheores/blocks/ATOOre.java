@@ -57,6 +57,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ATOOre extends BlockOre {
 
 	public final Block oreBlock = null;
+	public boolean base;
 	public String name;
 	public String baseName;
 	public String suffix;
@@ -138,14 +139,15 @@ public class ATOOre extends BlockOre {
 	public Boolean toolsRecipe = true;
 	public Boolean armorRecipe = true;
 
-	public ATOOre(String name, int color, int dropType, int dropMin, int dropMax, int hardness, int harvestLevel, int oreRenderType, String type, String underlyingBlockName, int veinRate, int veinSize, int veinHeight, List<Integer> dimWhiteList, List<Integer> dimBlackList, Boolean enableSmelt, Boolean enableMacerate, Boolean enableCrush, Boolean falls, Boolean useDust, ATOOre ore) {
+	public ATOOre(String name, int color, int dropType, int dropMin, int dropMax, int hardness, int harvestLevel, int oreRenderType, String type, String underlyingBlockName, int veinRate, int veinSize, int veinHeight, List<Integer> dimWhiteList, List<Integer> dimBlackList, Boolean enableSmelt, Boolean enableMacerate, Boolean enableCrush, Boolean falls, Boolean useDust, Boolean base, ATOOre ore) {
 		// subTypes = Poor, Dense, Nether, End
 		this.subType = (type.toLowerCase().startsWith("poor") ? "poor" : (type.toLowerCase().startsWith("dense") ? "dense" : (type.toLowerCase().startsWith("nethernether") ? "nether" : (type.toLowerCase().startsWith("endend") ? "end" : ""))));
 		// types = Sand, Gravel, Nether, End
 		this.type = (type.toLowerCase().endsWith("nether") ? "nether" : (type.toLowerCase().endsWith("end") ? "end" : (type.toLowerCase().endsWith("sand") ? "sand" : (type.toLowerCase().endsWith("gravel") ? "gravel" : ""))));
-		this.name = (this.subType.equals("") || this.subType.equals("nether") || this.subType.equals("end") ? "" : this.subType + "_") + name.replaceAll("__", "_").toLowerCase() + "_" + "ore";
 		this.baseName = name;
+		this.name = (this.subType.equals("") || this.subType.equals("nether") || this.subType.equals("end") ? "" : this.subType + "_") + name.replaceAll("__", "_").toLowerCase() + "_" + "ore";
 		this.color = color;
+		this.base = base;
 
 		LogHelper.mod_debug("*** Setup for " + this.name + " ***");
 		LogHelper.mod_debug("*** " + this.getUnlocalizedName() + " ***");
@@ -214,12 +216,12 @@ public class ATOOre extends BlockOre {
 		}
 	}
 
-	public ATOOre(String name, int color, int dropType, int dropMin, int dropMax, int hardness, int harvestLevel, int oreRenderType, String type, String underlyingBlockName, int veinRate, int veinSize, int veinHeight, List<Integer> dimWhiteList, List<Integer> dimBlackList, Boolean enableSmelt, Boolean enableMacerate, Boolean enableCrush, Boolean falls, Boolean useDust) {
-		this(name, color, dropType, dropMin, dropMax, hardness, harvestLevel, oreRenderType, type, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, enableSmelt, enableMacerate, enableCrush, falls, useDust, null);
+	public ATOOre(String name, int color, int dropType, int dropMin, int dropMax, int hardness, int harvestLevel, int oreRenderType, String type, String underlyingBlockName, int veinRate, int veinSize, int veinHeight, List<Integer> dimWhiteList, List<Integer> dimBlackList, Boolean enableSmelt, Boolean enableMacerate, Boolean enableCrush, Boolean falls, Boolean useDust, Boolean base) {
+		this(name, color, dropType, dropMin, dropMax, hardness, harvestLevel, oreRenderType, type, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, enableSmelt, enableMacerate, enableCrush, falls, useDust, base, null);
 	}
 
-	public ATOOre(String name, ATOOre ore, String type, String underlyingBlockName) {
-		this(name, ore.color, ore.dropType, ore.dropMin, ore.dropMax, ore.hardness, ore.harvestLevel, ore.oreRenderType, type, underlyingBlockName, ore.veinRate, ore.veinSize, ore.veinHeight, ore.dimWhiteList, ore.dimBlackList, ore.enableSmelt, ore.enableMacerate, ore.enableCrush, ore.falls, ore.useDust, ore);
+	public ATOOre(String name, ATOOre ore, String type, String underlyingBlockName, Boolean base) {
+		this(name, ore.color, ore.dropType, ore.dropMin, ore.dropMax, ore.hardness, ore.harvestLevel, ore.oreRenderType, type, underlyingBlockName, ore.veinRate, ore.veinSize, ore.veinHeight, ore.dimWhiteList, ore.dimBlackList, ore.enableSmelt, ore.enableMacerate, ore.enableCrush, ore.falls, ore.useDust, base, ore);
 		this.oreDenseRenderType = ore.oreDenseRenderType;
 		this.orePoorRenderType = ore.orePoorRenderType;
 		this.fallInstantly = ore.fallInstantly;
@@ -273,7 +275,7 @@ public class ATOOre extends BlockOre {
 	}
 
 	public String getPrefix() {
-		if (!type.equals("")) {
+		if (!type.equals("") && !base) {
 			return Utils.capitalize(type).trim() + " ";
 		} else {
 			return "";

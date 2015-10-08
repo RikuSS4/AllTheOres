@@ -333,8 +333,8 @@ public class ImageUtils {
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
-		g.drawImage(bgImage, 0, 0, null);
-		g.drawImage(fgImage, 0, 0, null);
+		g.drawImage(bgImage, 0, 0, w, h, null);
+		g.drawImage(fgImage, 0, 0, w, h, null);
 		g.dispose();
 		return output_image;
 	}

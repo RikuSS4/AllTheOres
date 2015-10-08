@@ -21,7 +21,7 @@ import cpw.mods.fml.common.Loader;
 public class Reference {
 	public static final String MOD_ID = "AllTheOres";
 	public static final String MOD_NAME = "All The Ores";
-	public static final String VERSION = "0.1.1";
+	public static final String VERSION = "0.1.3";
 	public static final String DEPS = "after:*;after:aobd";
 	public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ":";
 	public static final String CONFIG_PREFIX = ".";

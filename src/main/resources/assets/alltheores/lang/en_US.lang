@@ -8,6 +8,12 @@ item.Logo.name=RikuSS4
 
 AllTheOres.Substite=ORENAME
 AllTheOres.oreSubstite=ORENAME Ore
+AllTheOres.oreDenseSubstite=Dense ORENAME
+AllTheOres.orePoorSubstite=Poor ORENAME
+AllTheOres.oreNetherSubstite=ORENAME Nether
+AllTheOres.oreEndSubstite=ORENAME End
+AllTheOres.oreGravelSubstite=ORENAME Gravel
+AllTheOres.oreSandSubstite=ORENAME Sand
 AllTheOres.blockSubstite=ORENAME Block
 AllTheOres.brickSubstite=ORENAME Brick
 AllTheOres.ingotSubstite=ORENAME Ingot
