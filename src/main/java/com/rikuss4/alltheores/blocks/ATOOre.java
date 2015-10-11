@@ -151,6 +151,9 @@ public class ATOOre extends BlockOre {
 
 		LogHelper.mod_debug("*** Setup for " + this.name + " ***");
 		LogHelper.mod_debug("*** " + this.getUnlocalizedName() + " ***");
+		LogHelper.mod_debug("type: " + type);
+		LogHelper.mod_debug("type: " + this.type);
+		LogHelper.mod_debug("subType: " + this.subType);
 		this.dropType = dropType;
 		this.dropMin = dropMin;
 		this.dropMax = dropMax;
@@ -170,7 +173,10 @@ public class ATOOre extends BlockOre {
 		this.oreRenderType = oreRenderType;
 		this.falls = falls;
 		this.useDust = useDust;
-		this.oreDictName = (this.subType.equals("") ? "ore" : ((this.subType.equals("nether") || this.subType.equals("end")) ? "ore" : this.subType + "ore")) + Utils.capitalize(name).replaceAll(" ", "");
+		this.oreDictName = (this.subType.equals("") && (this.type.equals("nether")) || (this.type.equals("end"))) ? "ore" + Utils.capitalize(this.type).replaceAll(" ", "") : "ore";
+		this.oreDictName = this.oreDictName + Utils.capitalize(name).replaceAll(" ", "");
+		//this.oreDictName = (this.subType.equals("") ? "ore" : this.subType.equalsIgnoreCase("nether") ? "oreNether" : this.subType.equalsIgnoreCase("end") ? "oreEnd" : this.subType + "ore") + Utils.capitalize(name).replaceAll(" ", "");
+		LogHelper.mod_debug("oreDictName: " + this.oreDictName);
 
 		this.setBlockName(this.name);
 		this.setBlockTextureName(this.name);
@@ -444,8 +450,8 @@ public class ATOOre extends BlockOre {
 		LogHelper.mod_debug(this.name);
 		LogHelper.mod_debug(this.oreDictName);
 		LogHelper.mod_debug(this.getUnlocalizedName());
-		if (oreDictName != null) {
-			OreDictionary.registerOre(oreDictName, this);
+		if (this.oreDictName != null) {
+			OreDictionary.registerOre(this.oreDictName, this);
 			// UBC ore dictionary
 			if (Reference.isUBCLoaded) {
 				String blockName = "_" + Reference.MOD_ID.toLowerCase() + "_" + name;
@@ -454,7 +460,7 @@ public class ATOOre extends BlockOre {
 						LogHelper.mod_debug(Reference.MOD_ID + ":" + stone + blockName + ":" + i);
 						ItemStack blockOreItem = Utils.getItemStack(Reference.MOD_ID + ":" + stone + blockName, i);
 						if (blockOreItem != null && OreDictionary.getOreID(blockOreItem) == -1)
-							OreDictionary.registerOre(oreDictName, blockOreItem);
+							OreDictionary.registerOre(this.oreDictName, blockOreItem);
 					}
 				}
 			}

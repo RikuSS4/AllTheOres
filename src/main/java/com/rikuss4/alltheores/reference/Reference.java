@@ -21,12 +21,12 @@ import cpw.mods.fml.common.Loader;
 public class Reference {
 	public static final String MOD_ID = "AllTheOres";
 	public static final String MOD_NAME = "All The Ores";
-	public static final String VERSION = "0.1.5";
+	public static final String VERSION = "0.1.6";
 	public static final String DEPS = "after:*;after:aobd";
 	public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ":";
 	public static final String CONFIG_PREFIX = ".";
-	//public static final Boolean DEBUG = (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment");
-	public static final Boolean DEBUG = false;
+	public static final Boolean DEBUG = (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment");
+	//public static final Boolean DEBUG = false;
 
 	public static boolean isIC2Loaded = false;
 	public static boolean isEIOLoaded = false;
