@@ -19,10 +19,18 @@ AllTheOres.brickSubstite=ORENAME Brick
 AllTheOres.ingotSubstite=ORENAME Ingot
 AllTheOres.gemSubstite=ORENAME Gem
 AllTheOres.dustSubstite=ORENAME Dust
-AllTheOres.dustTinySubstite=Tiny Pile of ORENAME Dust
+AllTheOres.dusttinySubstite=Tiny Pile of ORENAME Dust
 AllTheOres.crushedSubstite=Crushed ORENAME Ore
 AllTheOres.purifiedCrushedSubstite=Purified Crushed ORENAME Ore
 AllTheOres.nuggetSubstite=ORENAME Nugget
+
+AllTheOres.shardSubstite=ORENAME Shard
+AllTheOres.chipSubstite=ORENAME Chip
+AllTheOres.chunkSubstite=ORENAME Chunk
+AllTheOres.oreberrySubstite=ORENAME Oreberry
+AllTheOres.clusterSubstite=ORENAME Cluster
+AllTheOres.ballberrySubstite=ORENAME Ball
+
 AllTheOres.swordSubstite=ORENAME Sword
 AllTheOres.spadeSubstite=ORENAME Shovel
 AllTheOres.pickaxeSubstite=ORENAME Pickaxe
@@ -32,10 +40,3 @@ AllTheOres.helmetSubstite=ORENAME Helmet
 AllTheOres.chestplateSubstite=ORENAME Chestplate
 AllTheOres.legsSubstite=ORENAME Leggings
 AllTheOres.bootsSubstite=ORENAME Boots
-AllTheOres.command.help=Outputs the current generated textures to the 'AllTheOrestextures' folder.
-AllTheOres.commandIdentify.help=Identifies the block's registry name and it's texture
-AllTheOres.commandIdentify.invalid=Currently held item is not a block
-AllTheOres.commandIdentify.invalidtexture=Unable to find valid texture
-AllTheOres.commandIdentify.multipleTextures=There are multiple textures available for S:baseBlockTexture
-AllTheOres.commandIdentify.start=-= Analyzing Item: %s =-
-AllTheOres.commandIdentify.obligitarydisclaimer=Disclaimer: These values are not guaranteed to be accurate

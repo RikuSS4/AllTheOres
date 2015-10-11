@@ -67,7 +67,7 @@ public class configHandler {
 	static LinkedList<ATOOre> POORENDORES_LIST = new LinkedList<ATOOre>();
 	static LinkedList<ATOOre> ENDORES_LIST = new LinkedList<ATOOre>();
 	static LinkedList<ATOOre> DENSEENDORES_LIST = new LinkedList<ATOOre>();
-	static ATODust ATODust = null; 
+	static ATODust ATODust = null;
 	static ATODustTiny ATODustTiny = null;
 	static ATONugget ATONugget = null;
 	static ATOIngot ATOIngot = null;
@@ -75,26 +75,34 @@ public class configHandler {
 	static ATOCrushedPurified ATOCrushedPurified = null;
 	static ATOBlock ATOBlock = null;
 	static ATOBrick ATOBrick = null;
-			
+
 	public static void preInit(Path configDir) {
 		Configuration config = new Configuration(Paths.get(configDir.toString() + "/core.cfg").toFile());
 
 		// Global Enable/Disable
 		Reference.CONFIG_ADD_SMELTING = config.getBoolean("add_smelting", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for smelting");
-		Reference.CONFIG_ADD_CRAFTING_BLOCK = config.getBoolean("add_crafting_block", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting blocks");
-		Reference.CONFIG_ADD_CRAFTING_BRICK = config.getBoolean("add_crafting_brick", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting bricks");
-		Reference.CONFIG_ADD_CRAFTING_NUGGET = config.getBoolean("add_crafting_nugget", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting nuggets");
-		Reference.CONFIG_ADD_CRAFTING_INGOT = config.getBoolean("add_crafting_ingot", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting ingots");
-		Reference.CONFIG_ADD_CRAFTING_WEAPON = config.getBoolean("add_crafting_weapon", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting weapons");
-		Reference.CONFIG_ADD_CRAFTING_TOOL = config.getBoolean("add_crafting_tool", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting tools");
-		Reference.CONFIG_ADD_CRAFTING_ARMOR = config.getBoolean("add_crafting_armor", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting armor");
+		Reference.CONFIG_ADD_CRAFTING_BLOCKS = config.getBoolean("add_crafting_blocks", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting blocks");
+		Reference.CONFIG_ADD_CRAFTING_BRICKS = config.getBoolean("add_crafting_bricks", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting bricks");
+		Reference.CONFIG_ADD_CRAFTING_NUGGETS = config.getBoolean("add_crafting_nuggets", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting nuggets");
+		Reference.CONFIG_ADD_CRAFTING_INGOTS = config.getBoolean("add_crafting_ingots", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting ingots");
+		Reference.CONFIG_ADD_CRAFTING_WEAPONS = config.getBoolean("add_crafting_weapons", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting weapons");
+		Reference.CONFIG_ADD_CRAFTING_TOOLS = config.getBoolean("add_crafting_tools", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting tools");
+		Reference.CONFIG_ADD_CRAFTING_ARMORS = config.getBoolean("add_crafting_armors", Configuration.CATEGORY_GENERAL, true, "Enable/Disable recipes for crafting armor");
 		Reference.CONFIG_GENERATE_ORES_CONFIG = config.getBoolean("generate_starter_ores", Configuration.CATEGORY_GENERAL, false, "Enable/Disable generating All.cfg of ores for starting point");
 		Reference.CONFIG_GENERATE_NETHER_ORES = config.getBoolean("generate_nether_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating nether ores");
+		Reference.CONFIG_GENERATE_DENSENETHER_ORES = config.getBoolean("generate_dense_nether_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating dense nether ores");
+		Reference.CONFIG_GENERATE_POORNETHER_ORES = config.getBoolean("generate_poor_nether_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating poor nether ores");
 		Reference.CONFIG_GENERATE_END_ORES = config.getBoolean("generate_end_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating end ores");
+		Reference.CONFIG_GENERATE_DENSEEND_ORES = config.getBoolean("generate_dense_end_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating dense end ores");
+		Reference.CONFIG_GENERATE_POOREND_ORES = config.getBoolean("generate_poor_end_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating poor end ores");
 		Reference.CONFIG_GENERATE_POOR_ORES = config.getBoolean("generate_poor_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating poor ores from base ores");
 		Reference.CONFIG_GENERATE_DENSE_ORES = config.getBoolean("generate_dense_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating dense ores from base ores");
 		Reference.CONFIG_GENERATE_SAND_ORES = config.getBoolean("generate_sand_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating sand ores from base ores");
+		Reference.CONFIG_GENERATE_DENSESAND_ORES = config.getBoolean("generate_dense_sand_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating dense sand ores");
+		Reference.CONFIG_GENERATE_POORSAND_ORES = config.getBoolean("generate_poor_sand_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating poor sand ores");
 		Reference.CONFIG_GENERATE_GRAVEL_ORES = config.getBoolean("generate_gravel_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating gravel ores from base ores");
+		Reference.CONFIG_GENERATE_DENSEGRAVEL_ORES = config.getBoolean("generate_dense_gravel_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating dense gravel ores");
+		Reference.CONFIG_GENERATE_POORGRAVEL_ORES = config.getBoolean("generate_poor_gravel_ores", Configuration.CATEGORY_GENERAL, true, "Enable/Disable generating poor gravel ores");
 
 		if (Reference.CONFIG_GENERATE_ORES_CONFIG) {
 			createDefaults(configDir);
@@ -132,7 +140,15 @@ public class configHandler {
 						String underlyingBlockName = config.get(category, "underlyingBlock", "minecraft:stone").getString();
 						Block underlyingBlock = Block.getBlockFromName(underlyingBlockName);
 						if (underlyingBlock != null) {
-							
+							ATODust = null;
+							ATODustTiny = null;
+							ATONugget = null;
+							ATOIngot = null;
+							ATOCrushed = null;
+							ATOCrushedPurified = null;
+							ATOBlock = null;
+							ATOBrick = null;
+
 							// Enabling/Disabling section
 							boolean toolsEnable = false;
 							boolean weaponsEnable = false;
@@ -460,30 +476,12 @@ public class configHandler {
 							if (config.hasKey(category, "extraDustTinyMeta")) {
 								extraDustTinyMeta = config.get(category, "extraDustTinyMeta", -1).getInt();
 							}
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
+
 							// Section: Register Ore
 							ATOOre ore = new ATOOre(oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, oreType, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust, true, null);
 							ore.oreDenseRenderType = (oreDenseRenderType < 0) ? oreRenderType : oreDenseRenderType;
 							ore.orePoorRenderType = (orePoorRenderType < 0) ? oreRenderType : orePoorRenderType;
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
+
 							// Section: Ingot setup
 							String ingotName = "";
 							String ingotType = "ingot";
@@ -517,14 +515,12 @@ public class configHandler {
 							if (ingotEnable && oreType.equals("")) {
 								ingotOreDictList = (ingotOreDictList.equalsIgnoreCase("") ? ingotType : ingotOreDictList);
 								List<String> ingotOreDictListArray = new ArrayList<String>(Arrays.asList(ingotOreDictList.split("\\s*,\\s*")));
-								ItemStack ingot = Utils.getItemStack(ingotMeta < 0 ? ingotName : ingotName + ":" + ingotMeta, 1);
+								ItemStack ingot = Utils.getItemStack(ingotName, ingotMeta);
 								if (!ingotForce && ingot != null) {
-									LogHelper.mod_debug(oreName + " Ingot: " + ingot.getUnlocalizedName());
 									ore.setIngot(ingot);
 								} else {
 									ATOIngot = new ATOIngot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime);
-									ore.setIngot(new ItemStack(ATOIngot));
-									LogHelper.mod_debug(oreName + " Ingot: " + ore.getIngot().getUnlocalizedName());
+									ore.setIngot(new ItemStack(ATOIngot).copy());
 								}
 							}
 
@@ -561,8 +557,7 @@ public class configHandler {
 							if (nuggetEnable && oreType.equals("")) {
 								nuggetOreDictList = (nuggetOreDictList.equalsIgnoreCase("") ? nuggetType : nuggetOreDictList);
 								List<String> nuggetOreDictListArray = new ArrayList<String>(Arrays.asList(nuggetOreDictList.split("\\s*,\\s*")));
-								;
-								ItemStack nugget = Utils.getItemStack(nuggetMeta < 0 ? nuggetName : nuggetName + ":" + nuggetMeta, 1);
+								ItemStack nugget = Utils.getItemStack(nuggetName, nuggetMeta);
 								if (!nuggetForce && nugget != null)
 									ore.setNugget(nugget);
 								else {
@@ -608,8 +603,7 @@ public class configHandler {
 							if (dustEnable && oreType.equals("")) {
 								dustOreDictList = (dustOreDictList.equalsIgnoreCase("") ? dustType : dustOreDictList);
 								List<String> dustOreDictListArray = new ArrayList<String>(Arrays.asList(dustOreDictList.split("\\s*,\\s*")));
-								;
-								ItemStack dust = Utils.getItemStack(dustMeta < 0 ? dustName : dustName + ":" + dustMeta, 1);
+								ItemStack dust = Utils.getItemStack(dustName, dustMeta);
 								if (!dustForce && dust != null)
 									ore.setDust(dust);
 								else {
@@ -652,8 +646,7 @@ public class configHandler {
 							if (dustTinyEnable && oreType.equals("")) {
 								dustTinyOreDictList = (dustTinyOreDictList.isEmpty() ? dustTinyType : dustTinyOreDictList);
 								List<String> dustTinyOreDictListArray = new ArrayList<String>(Arrays.asList(dustTinyOreDictList.split("\\s*,\\s*")));
-								;
-								ItemStack dustTiny = Utils.getItemStack(dustTinyMeta < 0 ? dustTinyName : dustTinyName + ":" + dustTinyMeta, 1);
+								ItemStack dustTiny = Utils.getItemStack(dustTinyName, dustTinyMeta);
 								if (!dustTinyForce && dustTiny != null)
 									ore.setDustTiny(dustTiny);
 								else {
@@ -735,20 +728,19 @@ public class configHandler {
 										}
 									}
 									if (Recipes.macerator.getOutputFor(new ItemStack(ore, 1), true) == null) {
-										ItemStack crushed = Utils.getItemStack(crushedMeta < 0 ? crushedName : crushedName + ":" + crushedMeta, 1);
+										ItemStack crushed = Utils.getItemStack(crushedName, crushedMeta);
 										if (!crushedForce && crushed != null)
 											ore.setCrushed(crushed);
 										else {
 											crushedOreDictList = (crushedOreDictList.isEmpty() ? crushedType : crushedOreDictList);
 											List<String> crushedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedOreDictList.split("\\s*,\\s*")));
-											;
 											ATOCrushed = new ATOCrushed(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedType, crushedOreDictListArray, crushedRenderType, crushedBurnTime);
 											ore.setCrushed(new ItemStack(ATOCrushed));
 										}
 									}
 									// Register Crushed Purified Ore
 									if (Recipes.oreWashing.getOutputFor(ore.getCrushed(1), true) == null) {
-										ItemStack crushedPurified = Utils.getItemStack(crushedPurifiedMeta < 0 ? crushedPurifiedName : crushedPurifiedName + ":" + crushedPurifiedMeta, 1);
+										ItemStack crushedPurified = Utils.getItemStack(crushedPurifiedName, crushedPurifiedMeta);
 										if (!crushedPurifiedForce && crushedPurified != null)
 											ore.setCrushedPurified(crushedPurified);
 										else {
@@ -783,8 +775,8 @@ public class configHandler {
 								blockColor = Utils.intFromHex(config.get(category, "blockColor", "000000").getString());
 							}
 							// Register Block
-							if ((blockEnable && (oreType.equals("")))) {
-								ItemStack block = Utils.getItemStack(blockMeta < 0 ? blockName : blockName + ":" + blockMeta, 1);
+							if (blockEnable && (oreType.equals("") || oreType.equals("ingot") || oreType.equals("gem"))) {
+								ItemStack block = Utils.getItemStack(blockName, blockMeta);
 								if (!blockForce && block != null)
 									ore.setBlock(block);
 								else {
@@ -815,8 +807,8 @@ public class configHandler {
 								brickColor = Utils.intFromHex(config.get(category, "brickColor", "000000").getString());
 							}
 							// Register Brick
-							if ((brickEnable && (oreType.equals("")))) {
-								ItemStack brick = Utils.getItemStack(brickMeta < 0 ? brickName : brickName + ":" + brickMeta, 1);
+							if (brickEnable && (oreType.equals("") || oreType.equals("ingot") || oreType.equals("gem"))) {
+								ItemStack brick = Utils.getItemStack(brickName, brickMeta);
 								if (!brickForce && brick != null)
 									ore.setBlock(brick);
 								else {
@@ -891,17 +883,24 @@ public class configHandler {
 							} else {
 								ORES_LIST.add(ore);
 							}
-							
-							
-							//Resources
-							if (ATODust != null) Reference.DUST_LIST.add(ATODust);
-							if (ATODustTiny != null) Reference.DUSTTINY_LIST.add(ATODustTiny);
-							if (ATONugget != null) Reference.NUGGET_LIST.add(ATONugget);
-							if (ATOIngot != null) Reference.INGOT_LIST.add(ATOIngot);
-							if (ATOCrushed != null) Reference.CRUSHED_LIST.add(ATOCrushed);
-							if (ATOCrushedPurified != null) Reference.CRUSHEDPURIFIED_LIST.add(ATOCrushedPurified);
-							if (ATOBlock != null) Reference.BLOCK_LIST.add(ATOBlock);
-							if (ATOBrick != null) Reference.BRICK_LIST.add(ATOBrick);
+
+							// Resources
+							if (ATODust != null && dustEnable)
+								Reference.DUST_LIST.add(ATODust);
+							if (ATODustTiny != null && dustTinyEnable)
+								Reference.DUSTTINY_LIST.add(ATODustTiny);
+							if (ATONugget != null && nuggetEnable)
+								Reference.NUGGET_LIST.add(ATONugget);
+							if (ATOIngot != null && ingotEnable)
+								Reference.INGOT_LIST.add(ATOIngot);
+							if (ATOCrushed != null && crushedEnable)
+								Reference.CRUSHED_LIST.add(ATOCrushed);
+							if (ATOCrushedPurified != null && crushedEnable)
+								Reference.CRUSHEDPURIFIED_LIST.add(ATOCrushedPurified);
+							if (ATOBlock != null && blockEnable)
+								Reference.BLOCK_LIST.add(ATOBlock);
+							if (ATOBrick != null && brickEnable)
+								Reference.BRICK_LIST.add(ATOBrick);
 						} else {
 							LogHelper.warn(oreName + ": Underlying Block \"" + underlyingBlockName + "\" not found.");
 							LogHelper.warn(oreName + ": Ore will not be added.");
@@ -918,21 +917,31 @@ public class configHandler {
 		}
 
 		// Sort ore list
-		ORES_LIST = sortOresList(ORES_LIST);
-		POORORES_LIST = sortOresList(POORORES_LIST);
-		DENSEORES_LIST = sortOresList(DENSEORES_LIST);
-		SANDORES_LIST = sortOresList(SANDORES_LIST);
-		POORSANDORES_LIST = sortOresList(POORSANDORES_LIST);
-		DENSESANDORES_LIST = sortOresList(DENSESANDORES_LIST);
-		GRAVELORES_LIST = sortOresList(GRAVELORES_LIST);
-		POORGRAVELORES_LIST = sortOresList(POORGRAVELORES_LIST);
-		DENSEGRAVELORES_LIST = sortOresList(DENSEGRAVELORES_LIST);
-		NETHERORES_LIST = sortOresList(NETHERORES_LIST);
-		POORNETHERORES_LIST = sortOresList(POORNETHERORES_LIST);
-		DENSENETHERORES_LIST = sortOresList(DENSENETHERORES_LIST);
-		ENDORES_LIST = sortOresList(ENDORES_LIST);
-		POORENDORES_LIST = sortOresList(POORENDORES_LIST);
-		DENSEENDORES_LIST = sortOresList(DENSEENDORES_LIST);
+		ORES_LIST = Utils.sortOresList(ORES_LIST);
+		POORORES_LIST = Utils.sortOresList(POORORES_LIST);
+		DENSEORES_LIST = Utils.sortOresList(DENSEORES_LIST);
+		SANDORES_LIST = Utils.sortOresList(SANDORES_LIST);
+		POORSANDORES_LIST = Utils.sortOresList(POORSANDORES_LIST);
+		DENSESANDORES_LIST = Utils.sortOresList(DENSESANDORES_LIST);
+		GRAVELORES_LIST = Utils.sortOresList(GRAVELORES_LIST);
+		POORGRAVELORES_LIST = Utils.sortOresList(POORGRAVELORES_LIST);
+		DENSEGRAVELORES_LIST = Utils.sortOresList(DENSEGRAVELORES_LIST);
+		NETHERORES_LIST = Utils.sortOresList(NETHERORES_LIST);
+		POORNETHERORES_LIST = Utils.sortOresList(POORNETHERORES_LIST);
+		DENSENETHERORES_LIST = Utils.sortOresList(DENSENETHERORES_LIST);
+		ENDORES_LIST = Utils.sortOresList(ENDORES_LIST);
+		POORENDORES_LIST = Utils.sortOresList(POORENDORES_LIST);
+		DENSEENDORES_LIST = Utils.sortOresList(DENSEENDORES_LIST);
+
+		// Sort other lists
+		Reference.INGOT_LIST = Utils.sortIngotList(Reference.INGOT_LIST);
+		Reference.NUGGET_LIST = Utils.sortNuggetList(Reference.NUGGET_LIST);
+		Reference.DUST_LIST = Utils.sortDustList(Reference.DUST_LIST);
+		Reference.DUSTTINY_LIST = Utils.sortDustTinyList(Reference.DUSTTINY_LIST);
+		Reference.CRUSHED_LIST = Utils.sortCrushedList(Reference.CRUSHED_LIST);
+		Reference.CRUSHEDPURIFIED_LIST = Utils.sortCrushedPurifiedList(Reference.CRUSHEDPURIFIED_LIST);
+		Reference.BLOCK_LIST = Utils.sortBlockList(Reference.BLOCK_LIST);
+		Reference.BRICK_LIST = Utils.sortBrickList(Reference.BRICK_LIST);
 
 		// Add all special ores to ORES_LIST
 		Reference.ORES_LIST.addAll(ORES_LIST);
@@ -971,14 +980,22 @@ public class configHandler {
 	}
 
 	private static void changeBaseOre(ATOOre ore) {
-		ATODust.setOre(ore);
-		ATODustTiny.setOre(ore);
-		ATONugget.setOre(ore);
-		ATOIngot.setOre(ore);
-		ATOCrushed.setOre(ore);
-		ATOCrushedPurified.setOre(ore);
-		ATOBlock.setOre(ore);
-		ATOBrick.setOre(ore);
+		if (ATODust != null)
+			ATODust.setOre(ore);
+		if (ATODustTiny != null)
+			ATODustTiny.setOre(ore);
+		if (ATONugget != null)
+			ATONugget.setOre(ore);
+		if (ATOIngot != null)
+			ATOIngot.setOre(ore);
+		if (ATOCrushed != null)
+			ATOCrushed.setOre(ore);
+		if (ATOCrushedPurified != null)
+			ATOCrushedPurified.setOre(ore);
+		if (ATOBlock != null)
+			ATOBlock.setOre(ore);
+		if (ATOBrick != null)
+			ATOBrick.setOre(ore);
 	}
 
 	private static void createSandOres(ATOOre ore, Boolean oreSandEnable, Boolean oreDenseSandEnable, Boolean orePoorSandEnable, boolean baseOre) {
@@ -987,7 +1004,7 @@ public class configHandler {
 			ATOOre oreSpecial = new ATOOre(ore.baseName + "__sand", ore, "sand", "minecraft:sand", false);
 			oreSpecial.falls = true;
 			SANDORES_LIST.add(oreSpecial);
-			if(baseOre) 
+			if (baseOre)
 				changeBaseOre(oreSpecial);
 			if (Reference.CONFIG_GENERATE_DENSESAND_ORES && oreDenseSandEnable) {
 				// Register Dense Sand Ore
@@ -1010,7 +1027,7 @@ public class configHandler {
 			ATOOre oreSpecial = new ATOOre(ore.baseName + "__gravel", ore, "gravel", "minecraft:gravel", false);
 			oreSpecial.falls = true;
 			GRAVELORES_LIST.add(oreSpecial);
-			if(baseOre) 
+			if (baseOre)
 				changeBaseOre(oreSpecial);
 			if (Reference.CONFIG_GENERATE_DENSEGRAVEL_ORES && oreDenseGravelEnable) {
 				// Register Dense Gravel Ore
@@ -1031,7 +1048,7 @@ public class configHandler {
 		if ((Reference.CONFIG_GENERATE_NETHER_ORES && oreNetherEnable)) {
 			ATOOre oreSpecial = new ATOOre(ore.baseName + "__nether", ore, "nether", "minecraft:netherrack", baseOre);
 			NETHERORES_LIST.add(oreSpecial);
-			if(baseOre) 
+			if (baseOre)
 				changeBaseOre(oreSpecial);
 			// Register Dense Nether Ore
 			if (Reference.CONFIG_GENERATE_DENSENETHER_ORES && oreDenseNetherEnable) {
@@ -1054,7 +1071,7 @@ public class configHandler {
 		if (Reference.CONFIG_GENERATE_END_ORES && oreEndEnable) {
 			ATOOre oreSpecial = new ATOOre(ore.baseName + "__end", ore, "end", "minecraft:end_stone", baseOre);
 			ENDORES_LIST.add(oreSpecial);
-			if(baseOre) 
+			if (baseOre)
 				changeBaseOre(oreSpecial);
 			// Register Dense End Ore
 			if (Reference.CONFIG_GENERATE_DENSEEND_ORES && oreDenseEndEnable) {
@@ -1071,16 +1088,6 @@ public class configHandler {
 				POORENDORES_LIST.add(oreSpecial);
 			}
 		}
-	}
-
-	private static LinkedList<ATOOre> sortOresList(LinkedList<ATOOre> ORES_LIST) {
-		Collections.sort(ORES_LIST, new Comparator<ATOOre>() {
-			@Override
-			public int compare(ATOOre o1, ATOOre o2) {
-				return o1.name.compareToIgnoreCase(o2.name);
-			}
-		});
-		return ORES_LIST;
 	}
 
 	public static void createDefaults(Path configDir) {

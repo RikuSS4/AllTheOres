@@ -8,14 +8,5 @@ ore_6 = nether
 ore_7 = precious
 ore_8 = utility
 ore_9 = nether gem
-ore_20 = poor vanilla standard
-ore_21 = poor vanilla lapis
-ore_22 = poor vanilla emerald
-ore_23 = poor vanilla quartz
-ore_24 = poor end
-ore_25 = poor fantasy
-ore_26 = poor nether
-ore_27 = poor precious
-ore_28 = poor utility
-ore_29 = poor nether gem
-
+ore_10 = gem
+ore_11 = infused

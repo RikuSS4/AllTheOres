@@ -6,28 +6,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 
 import com.rikuss4.alltheores.blocks.ATOBrick;
+import com.rikuss4.alltheores.utility.Utils;
 
 public class ATOBrickItem extends ItemBlock {
-    private ATOBrick brick;
+	private ATOBrick brick;
 
-    public ATOBrickItem(Block block) {
-        super(block);
+	public ATOBrickItem(Block block) {
+		super(block);
 
-        setBlock((ATOBrick) block);
-    }
+		setBlock((ATOBrick) block);
+	}
 
-    public ATOBrick getBrick() {
-        return brick;
-    }
+	public ATOBrick getBrick() {
+		return brick;
+	}
 
-    public void setBlock(ATOBrick brick) {
-        this.brick = brick;
-    }
+	public void setBlock(ATOBrick brick) {
+		this.brick = brick;
+	}
 
-    @Override
-    public String getItemStackDisplayName(ItemStack itemStack) {
-  		String name = new ItemStack(getBrick().getOre()).getDisplayName(); 
-  		name = name.substring(0, (name.lastIndexOf(StatCollector.translateToLocal("AllTheOres.oreSubstite").trim().replaceFirst("ORENAME", ""))));
-        return (StatCollector.translateToLocal("AllTheOres.brickSubstite")).replaceFirst("ORENAME", name);
-    }
+	@Override
+	public String getItemStackDisplayName(ItemStack itemStack) {
+		String name = new ItemStack(getBrick().getOre()).getDisplayName();
+		if (getBrick().getOre() != null)
+			name = Utils.capitalize(getBrick().getOre().baseName).trim();
+		//name = name.substring(0, (name.lastIndexOf(StatCollector.translateToLocal("AllTheOres.oreSubstite").trim().replaceFirst("ORENAME", ""))));
+		return (StatCollector.translateToLocal("AllTheOres.brickSubstite")).replaceFirst("ORENAME", name);
+	}
 }

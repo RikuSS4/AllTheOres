@@ -444,7 +444,7 @@ public class ATOOre extends BlockOre {
 		LogHelper.mod_debug(this.name);
 		LogHelper.mod_debug(this.oreDictName);
 		LogHelper.mod_debug(this.getUnlocalizedName());
-		if (oreDictName != null && Reference.DEBUG) {
+		if (oreDictName != null) {
 			OreDictionary.registerOre(oreDictName, this);
 			// UBC ore dictionary
 			if (Reference.isUBCLoaded) {
@@ -452,7 +452,7 @@ public class ATOOre extends BlockOre {
 				for (String stone : typeStones) {
 					for (int i = 0; i < 8; i++) {
 						LogHelper.mod_debug(Reference.MOD_ID + ":" + stone + blockName + ":" + i);
-						ItemStack blockOreItem = new ItemStack(GameRegistry.findItem(Reference.MOD_ID, stone + blockName), 1, i);
+						ItemStack blockOreItem = Utils.getItemStack(Reference.MOD_ID + ":" + stone + blockName, i);
 						if (blockOreItem != null && OreDictionary.getOreID(blockOreItem) == -1)
 							OreDictionary.registerOre(oreDictName, blockOreItem);
 					}
@@ -641,12 +641,11 @@ public class ATOOre extends BlockOre {
 	@Override
 	public int getExpDrop(IBlockAccess world, int metadata, int fortune) {
 		int exp = 0;
-      if (this.getItemDropped(metadata, rand, fortune) != Item.getItemFromBlock(this))
-      {
-      	if (Utils.isBetween(dropType, 1, 5))
-      		exp = MathHelper.ceiling_double_int(MathHelper.getRandomIntegerInRange(rand, getHarvestLevel(metadata) + getDropMin(), getHarvestLevel(metadata) + getDropMax()));
-      	LogHelper.mod_debug("Block XP Dropped:" + exp);
-      }
+		if (this.getItemDropped(metadata, rand, fortune) != Item.getItemFromBlock(this)) {
+			if (Utils.isBetween(dropType, 1, 5))
+				exp = MathHelper.ceiling_double_int(MathHelper.getRandomIntegerInRange(rand, getHarvestLevel(metadata) + getDropMin(), getHarvestLevel(metadata) + getDropMax()));
+			LogHelper.mod_debug("Block XP Dropped:" + exp);
+		}
 		return exp;
 	}
 
@@ -961,7 +960,7 @@ public class ATOOre extends BlockOre {
 		LogHelper.mod_debug("*** Crafting for " + this.name + " ***");
 		if (this.ore == null) {
 			// Block Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_BLOCK && blockRecipe && getBlock(1) != null) {
+			if (Reference.CONFIG_ADD_CRAFTING_BLOCKS && blockRecipe && getBlock(1) != null) {
 				ItemStack block = null;
 				ItemStack material = null;
 				// Use Ingots for Block recipe
@@ -976,21 +975,23 @@ public class ATOOre extends BlockOre {
 
 				// Ingot ==> Block Crafting
 				String[] materialInfo = Utils.getItemInfo(material);
-				int i=0;
-				for(String tmp : materialInfo) {
+				int i = 0;
+				for (String tmp : materialInfo) {
 					LogHelper.mod_debug("materialInfo(" + i + ")" + tmp);
 					i++;
 				}
 				if (materialInfo != null && !materialInfo[3].equals("") && material != null) {
 					LogHelper.mod_debug("Ore Dictionary: 9x " + materialInfo[0] + " " + materialInfo[3] + " ==> " + block.getUnlocalizedName());
 					GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3] }));
-					//GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn", "nnn", "nnn", 'n', outputInfo[3]));
+					// GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn",
+					// "nnn", "nnn", 'n', outputInfo[3]));
 				} else if (block != null && material != null) {
 					LogHelper.mod_debug("9x " + material.getUnlocalizedName() + " ==> " + block.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { material, material, material, material, material, material, material, material, material}));
-					//GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn", "nnn", "nnn", 'n', output));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { material, material, material, material, material, material, material, material, material }));
+					// GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn",
+					// "nnn", "nnn", 'n', output));
 				}
-				
+
 				// Block ==> Ingot Crafting
 				if (block != null) {
 					LogHelper.mod_debug(block.getUnlocalizedName() + " ==> 9x" + material.getUnlocalizedName());
@@ -999,7 +1000,7 @@ public class ATOOre extends BlockOre {
 			}
 
 			// Brick Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_BRICK && brickRecipe && getBrick(1) != null && getIngot(1) != null && !useDust()) {
+			if (Reference.CONFIG_ADD_CRAFTING_BRICKS && brickRecipe && getBrick(1) != null && getIngot(1) != null && !useDust()) {
 				ItemStack brick = getBrick();
 				ItemStack ingot = getIngot();
 				String[] ingotInfo = Utils.getItemInfo(ingot);
@@ -1010,9 +1011,9 @@ public class ATOOre extends BlockOre {
 					GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingotInfo[3], ingotInfo[3], ingotInfo[3], ingotInfo[3] }));
 				} else if (getIngot(1) != null) {
 					LogHelper.mod_debug("4x " + getIngot().getUnlocalizedName() + " ==> " + brick.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingot, ingot, ingot, ingot}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingot, ingot, ingot, ingot }));
 				}
-				
+
 				// Brick ==> Ingot Crafting
 				if (ingot != null) {
 					LogHelper.mod_debug(brick.getUnlocalizedName() + " ==> 4x " + ingot.getUnlocalizedName());
@@ -1021,64 +1022,65 @@ public class ATOOre extends BlockOre {
 			}
 
 			// Ingot ==> Nugget Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_NUGGET && nuggetRecipe && getIngot(1) != null && getNugget(1) != null && getIngot(1) != getNugget(1)) {
+			if (Reference.CONFIG_ADD_CRAFTING_NUGGETS && nuggetRecipe && getIngot(1) != null && getNugget(1) != null && getIngot(1) != getNugget(1)) {
 				ItemStack ingot = getIngot();
 				ItemStack nugget = getNugget();
 				String[] ingotInfo = Utils.getItemInfo(ingot);
 				if (ingot != nugget && !ingotInfo[3].equals("")) {
 					LogHelper.mod_debug("Ore Dictionary: " + ingotInfo[0] + " " + ingotInfo[3] + " ==> 9x " + nugget.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] {ingotInfo[3]}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] { ingotInfo[3] }));
 				} else if (ingot != null && nugget != null) {
 					LogHelper.mod_debug("" + ingot.getUnlocalizedName() + " ==> 9x " + nugget.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] {ingot}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] { ingot }));
 				}
 			}
 
 			// Nugget ==> Ingot Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_INGOT && ingotRecipe && getIngot(1) != null && getNugget(1) != null && getIngot(1) != getNugget(1)) {
+			if (Reference.CONFIG_ADD_CRAFTING_INGOTS && ingotRecipe && getIngot(1) != null && getNugget(1) != null && getIngot(1) != getNugget(1)) {
 				ItemStack nugget = getNugget();
 				ItemStack ingot = getIngot();
 				String[] nuggetInfo = Utils.getItemInfo(nugget);
 				if (nugget != ingot && !nuggetInfo[3].equals("")) {
 					LogHelper.mod_debug("Ore Dictionary: 9x " + nuggetInfo[0] + " " + nuggetInfo[3] + " ==> " + ingot.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] {nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3]}));
-					//GameRegistry.addRecipe(new ShapedOreRecipe(output, "nnn", "nnn", "nnn", 'n', inputInfo[3]));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] { nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3] }));
+					// GameRegistry.addRecipe(new ShapedOreRecipe(output, "nnn",
+					// "nnn", "nnn", 'n', inputInfo[3]));
 				} else if (nugget != null && ingot != null) {
 					LogHelper.mod_debug("9x " + nugget.getUnlocalizedName() + " ==> " + ingot.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] {nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] { nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget }));
 				}
 			}
 
 			// Dust ==> Tiny Dust Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_DUSTSTINY && dustTinyRecipe && getDust(1) != null && getDustTiny(1) != null && getDust(1) != getDustTiny(1)) {
+			if (Reference.CONFIG_ADD_CRAFTING_DUSTSTINYS && dustTinyRecipe && getDust(1) != null && getDustTiny(1) != null && getDust(1) != getDustTiny(1)) {
 				ItemStack dust = getDust();
 				ItemStack dustTiny = getDustTiny();
 				String[] dustInfo = Utils.getItemInfo(dust);
 				if (dust != dustTiny && !dustInfo[3].equals("")) {
 					LogHelper.mod_debug("Ore Dictionary: " + dustInfo[0] + " " + dustInfo[3] + " ==> 9x " + dustTiny.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] {dustInfo[3]}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] { dustInfo[3] }));
 				} else if (dust != null && dustTiny != null) {
 					LogHelper.mod_debug("" + dust.getDisplayName() + " ==> 9x " + dustTiny.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] {dust}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] { dust }));
 				}
 			}
 
 			// Tiny Dust ==> Dust Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_DUST && dustRecipe && getDust(1) != null && getDustTiny(1) != null && getDust(1) != getDustTiny(1)) {
+			if (Reference.CONFIG_ADD_CRAFTING_DUSTS && dustRecipe && getDust(1) != null && getDustTiny(1) != null && getDust(1) != getDustTiny(1)) {
 				ItemStack dustTiny = getDustTiny();
 				ItemStack dust = getDust();
 				String[] dustTinyInfo = Utils.getItemInfo(dustTiny);
 				if (dustTiny != dust && !dustTinyInfo[3].equals("")) {
 					LogHelper.mod_debug("Ore Dictionary: 9x " + dustTinyInfo[0] + " " + dustTinyInfo[3] + " ==> " + dust.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] {dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3]}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] { dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3] }));
 				} else if (dustTiny != null && dust != null) {
 					LogHelper.mod_debug("9x " + dustTiny.getDisplayName() + " ==> " + dust.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] {dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny}));
+					GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] { dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny }));
 				}
 			}
 
 			// Weapon Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_WEAPON && weaponRecipe && getIngot(1) != null) {
+			if (Reference.CONFIG_ADD_CRAFTING_WEAPONS && weaponRecipe && getIngot(1) != null) {
 				String inputOreDict = null;
 				String inputStick = "stickWood";
 				ItemStack input = getIngot(1);
@@ -1093,7 +1095,7 @@ public class ATOOre extends BlockOre {
 			}
 
 			// Tools Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_TOOL && toolsRecipe && getIngot(1) != null) {
+			if (Reference.CONFIG_ADD_CRAFTING_TOOLS && toolsRecipe && getIngot(1) != null) {
 				ItemStack input = getIngot(1);
 				String inputStick = "stickWood";
 				String inputIngot = null;
@@ -1136,7 +1138,7 @@ public class ATOOre extends BlockOre {
 			}
 
 			// Armor Crafting
-			if (Reference.CONFIG_ADD_CRAFTING_ARMOR && armorRecipe) {
+			if (Reference.CONFIG_ADD_CRAFTING_ARMORS && armorRecipe) {
 				if (ingot != null && ingot.getOreDictName() != null) {
 					String input = ingot.getOreDictName().get(0);
 					if (helmet != null) {
@@ -1234,7 +1236,7 @@ public class ATOOre extends BlockOre {
 	}
 
 	public void setExtraDust(String name) {
-		ItemStack newItem = Utils.getItemStack(name, 1);
+		ItemStack newItem = Utils.getItemStack(name);
 		if (newItem == null) {
 			this.extraDustItem = getDust(1);
 		} else {
@@ -1243,7 +1245,7 @@ public class ATOOre extends BlockOre {
 	}
 
 	public void setExtraDustTiny(String name) {
-		ItemStack newItem = Utils.getItemStack(name, 1);
+		ItemStack newItem = Utils.getItemStack(name);
 		if (newItem == null) {
 			this.extraDustTinyItem = getDustTiny(1);
 		} else {
@@ -1291,7 +1293,7 @@ public class ATOOre extends BlockOre {
 		if (item != null && item.getItem() != null) {
 			smeltingOutputItem = item;
 		} else {
-			ItemStack newItem = Utils.getItemStack(name, 1);
+			ItemStack newItem = Utils.getItemStack(name);
 			if (newItem != null) {
 				smeltingOutputItem = newItem;
 			} else if (oreDictName != null && Reference.useOreDictForItems) {
@@ -1531,7 +1533,7 @@ public class ATOOre extends BlockOre {
 				}
 				if (iRecipe != null) {
 					Boolean match = false;
-					if (Reference.CONFIG_ADD_CRAFTING_BLOCK && ore.blockRecipe) {
+					if (Reference.CONFIG_ADD_CRAFTING_BLOCKS && ore.blockRecipe) {
 						ArrayList<ItemStack> oreDict = OreDictionary.getOres("block" + Utils.capitalize(ore.baseName));
 						for (ItemStack item : oreDict) {
 							if (item.isItemEqual(iRecipe.getRecipeOutput())) {
@@ -1540,7 +1542,7 @@ public class ATOOre extends BlockOre {
 							}
 						}
 					}
-					if (Reference.CONFIG_ADD_CRAFTING_INGOT && ore.ingotRecipe) {
+					if (Reference.CONFIG_ADD_CRAFTING_INGOTS && ore.ingotRecipe) {
 						ArrayList<ItemStack> oreDict = OreDictionary.getOres("ingot" + Utils.capitalize(ore.baseName));
 						for (ItemStack item : oreDict) {
 							if (item.splitStack(9).isItemEqual(iRecipe.getRecipeOutput())) {

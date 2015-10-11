@@ -3,6 +3,9 @@ package com.rikuss4.alltheores.utility;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -14,7 +17,15 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import com.rikuss4.alltheores.blocks.ATOBlock;
+import com.rikuss4.alltheores.blocks.ATOBrick;
 import com.rikuss4.alltheores.blocks.ATOOre;
+import com.rikuss4.alltheores.items.Resources.ATOCrushed;
+import com.rikuss4.alltheores.items.Resources.ATOCrushedPurified;
+import com.rikuss4.alltheores.items.Resources.ATODust;
+import com.rikuss4.alltheores.items.Resources.ATODustTiny;
+import com.rikuss4.alltheores.items.Resources.ATOIngot;
+import com.rikuss4.alltheores.items.Resources.ATONugget;
 import com.rikuss4.alltheores.reference.Reference;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -78,37 +89,61 @@ public class Utils {
 			return null;
 		}
 		if (itemName.lastIndexOf(":") >= 0) {
-			if (getItemStack(itemName, 1) != null) {
+			if (getItemStack(itemName) != null) {
 				return getItemStack(itemName, 1).getItem();
 			}
 		} else {
-			if (getItemStack("minecraft:" + itemName, 1) != null) {
-				return getItemStack("minecraft:" + itemName, 1).getItem();
+			if (getItemStack("minecraft:" + itemName) != null) {
+				return getItemStack("minecraft:" + itemName).getItem();
 			}
 		}
 		return null;
 	}
 
 	public static ItemStack getItemStack(String itemName) {
-		return getItemStack(itemName, 1);
+		return getItemStack(itemName, 0);
 	}
 
-	public static ItemStack getItemStack(String itemName, int stackSize) {
-		if (itemName == null || (Item) Item.itemRegistry.getObject(itemName) == null) {
+	public static ItemStack getItemStack(String itemName, int itemMeta) {
+		if (itemMeta < 0)
+			itemMeta = 0;
+		return getItemStack(itemName, itemMeta, 1);
+	}
+
+	public static ItemStack getItemStack(String itemName, int itemMeta, int stackSize) {
+		if (itemName == null)
 			return null;
-		}
-		return new ItemStack((Item) Item.itemRegistry.getObject(itemName), stackSize);
-		/*int meta = 0;
+		LogHelper.mod_debug("getItemStack() {");
+		LogHelper.mod_debug("itemName: " + itemName);
+		LogHelper.mod_debug("itemMeta: " + itemMeta);
+		// if ((Item) Item.itemRegistry.getObject(itemName + ":" + itemMeta) !=
+		// null)
+		// return new ItemStack((Item) Item.itemRegistry.getObject(itemName + ":"
+		// + itemMeta), stackSize);
+		// else
+		// return new ItemStack((Item) Item.itemRegistry.getObject(itemName),
+		// stackSize);
 		itemName = itemName.trim();
 		String[] item = itemName.split(":", 3);
 
-		if (item.length > 2 && Utils.isInteger(item[2])) {
-			meta = Integer.parseInt(item[2]);
-		} else if (item.length > 1 && Utils.isInteger(item[1])) {
-			meta = Integer.parseInt(item[1]);
+		if (item.length > 2 && Utils.isInteger(item[item.length - 1])) {
+			itemMeta = Integer.parseInt(item[item.length - 1]);
+			for (int i = 1; i < item.length - 1; i++)
+				item[0] = item[0] + ":" + item[i];
+		} else if (item.length == 2 && Utils.isInteger(item[1])) {
+			itemMeta = Integer.parseInt(item[1]);
+		} else if (item.length > 1) {
+			for (int i = 1; i < item.length; i++)
+				item[0] = item[0] + ":" + item[i];
 		}
-		
-		return new ItemStack((Item) Item.itemRegistry.getObject(itemName), stackSize, meta);
+
+		for (int i = 0; i < item.length; i++)
+			LogHelper.mod_debug("item[" + i + "]: " + item[i]);
+		LogHelper.mod_debug("itemMeta: " + itemMeta);
+
+		LogHelper.mod_debug("}");
+		if ((Item) Item.itemRegistry.getObject(item[0]) != null)
+			return new ItemStack((Item) Item.itemRegistry.getObject(item[0]), stackSize, itemMeta);
 		/*
 		 * } else if (item.length > 2) {
 		 * if (item[2].lastIndexOf(":") >= 0 &&
@@ -134,8 +169,8 @@ public class Utils {
 		 * return new ItemStack(GameRegistry.findItem("minecraft", item[0]),
 		 * stackSize);
 		 * }
-		 * return null;
 		 */
+		return null;
 	}
 
 	/*
@@ -179,7 +214,7 @@ public class Utils {
 	}
 
 	public static int between(int min, int max) {
-	    return min + (int)(Math.random() * ((max - min) + 1));
+		return min + (int) (Math.random() * ((max - min) + 1));
 	}
 
 	public static boolean isBetween(int num, int min, int max) {
@@ -192,7 +227,8 @@ public class Utils {
 			String Mod_ID = GameRegistry.findUniqueIdentifierFor(item.getItem()).modId.toLowerCase();
 			LogHelper.mod_debug("***" + Mod_ID + " ***");
 			for (String mod : Reference.PreferredOrder) {
-				if (mod.equals(Mod_ID)) return item;
+				if (mod.equals(Mod_ID))
+					return item;
 			}
 		}
 		if (oreDict.size() > 0) {
@@ -219,11 +255,13 @@ public class Utils {
 	}
 
 	public static String removeEIORecipe(ItemStack input) {
-		if (input == null || input.getItem() == null) return null;
+		if (input == null || input.getItem() == null)
+			return null;
 		String[] inputItemInfo = getItemInfo(input);
-		if (inputItemInfo == null) return null;
+		if (inputItemInfo == null)
+			return null;
 		String recipe = "<AlloySmelterRecipes><vanillaFurnaceRecipes><exclude>" + (!inputItemInfo[3].equals("") ? "<itemStack oreDictionary=\"" + inputItemInfo[3] + "\" />" : "<itemStack modID=\"" + inputItemInfo[0] + "\" itemName=\"" + inputItemInfo[1] + "\" itemMeta=\"" + inputItemInfo[2] + "\"/>");
-		
+
 		recipe = recipe + "</exclude></vanillaFurnaceRecipes>";
 		recipe = recipe + "<recipeGroup name=\"" + Reference.MOD_ID + "\" enabled=\"false\">" + "<recipe name=\"" + inputItemInfo[1] + "\" energyCost=\"2400\">" + "<input>" + (!inputItemInfo[3].equals("") ? "<itemStack oreDictionary=\"" + inputItemInfo[3] + "\" />" : "<itemStack modID=\"" + inputItemInfo[0] + "\" itemName=\"" + inputItemInfo[1] + "\" itemMeta=\"" + inputItemInfo[2] + "\" number=\"" + input.stackSize + "\" />") + "</input>";
 		recipe = recipe + "<output /></recipe></recipeGroup></AlloySmelterRecipes>";
@@ -232,24 +270,27 @@ public class Utils {
 	}
 
 	public static String getEIORecipe(ItemStack input, ItemStack... outputs) {
-		if (input == null || input.getItem() == null || outputs == null) return null;
+		if (input == null || input.getItem() == null || outputs == null)
+			return null;
 		String[] inputItemInfo = getItemInfo(input);
-		if (inputItemInfo == null) return null;
+		if (inputItemInfo == null)
+			return null;
 		String recipe = "<AlloySmelterRecipes><recipeGroup name=\"" + Reference.MOD_ID + "\">" + "<recipe name=\"" + inputItemInfo[1] + "\" energyCost=\"2400\">" + "<input>" + (!inputItemInfo[3].equals("") ? "<itemStack oreDictionary=\"" + inputItemInfo[3] + "\" />" : "<itemStack modID=\"" + inputItemInfo[0] + "\" itemName=\"" + inputItemInfo[1] + "\" itemMeta=\"" + inputItemInfo[2] + "\" number=\"" + input.stackSize + "\" />") + "</input>" + "<output>";
 		String items = "";
-		
+
 		// Create Outputs
 		for (ItemStack output : outputs) {
 			if (output != null && output.getItem() != null) {
 				String[] outputItemInfo = getItemInfo(output);
 				if (outputItemInfo != null) {
-				items = items + "<itemStack modID=\"" + outputItemInfo[0] + "\" itemName=\"" + outputItemInfo[1] + "\" itemMeta=\"" + outputItemInfo[2] + "\" number=\"" + output.stackSize + "\" />";
-				LogHelper.mod_debug("Recipe " + input.stackSize + "x" + input.getDisplayName() + " => " + output.stackSize + "x" + output.getDisplayName());
+					items = items + "<itemStack modID=\"" + outputItemInfo[0] + "\" itemName=\"" + outputItemInfo[1] + "\" itemMeta=\"" + outputItemInfo[2] + "\" number=\"" + output.stackSize + "\" />";
+					LogHelper.mod_debug("Recipe " + input.stackSize + "x" + input.getDisplayName() + " => " + output.stackSize + "x" + output.getDisplayName());
 				}
 			}
 		}
 
-		if (items.equals("")) return null;
+		if (items.equals(""))
+			return null;
 		recipe = recipe + items + "</output></recipe></recipeGroup></AlloySmelterRecipes>";
 		LogHelper.mod_debug(recipe);
 		return recipe;
@@ -274,10 +315,10 @@ public class Utils {
 					}
 					if (iRecipe != null) {
 						Boolean match = false;
-						if(Reference.CONFIG_ADD_CRAFTING_BLOCK && ore.blockRecipe) {
+						if (Reference.CONFIG_ADD_CRAFTING_BLOCKS && ore.blockRecipe) {
 							ArrayList<ItemStack> oreDict = OreDictionary.getOres("block" + Utils.capitalize(ore.baseName));
 							for (ItemStack item : oreDict) {
-								if(item.isItemEqual(iRecipe.getRecipeOutput())) {
+								if (item.isItemEqual(iRecipe.getRecipeOutput())) {
 									LogHelper.mod_debug("Match Found for " + iRecipe.getRecipeOutput().getDisplayName());
 									match = true;
 									break;
@@ -297,9 +338,99 @@ public class Utils {
 			newRecipes.clear();
 		}
 	}
-	
+
+	public static LinkedList<ATOOre> sortOresList(LinkedList<ATOOre> ORES_LIST) {
+		Collections.sort(ORES_LIST, new Comparator<ATOOre>() {
+			@Override
+			public int compare(ATOOre o1, ATOOre o2) {
+				return o1.name.compareToIgnoreCase(o2.name);
+			}
+		});
+		return ORES_LIST;
+	}
+
+	public static LinkedList<ATOIngot> sortIngotList(LinkedList<ATOIngot> LIST) {
+		Collections.sort(LIST, new Comparator<ATOIngot>() {
+			@Override
+			public int compare(ATOIngot o1, ATOIngot o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATONugget> sortNuggetList(LinkedList<ATONugget> LIST) {
+		Collections.sort(LIST, new Comparator<ATONugget>() {
+			@Override
+			public int compare(ATONugget o1, ATONugget o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATODust> sortDustList(LinkedList<ATODust> LIST) {
+		Collections.sort(LIST, new Comparator<ATODust>() {
+			@Override
+			public int compare(ATODust o1, ATODust o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATODustTiny> sortDustTinyList(LinkedList<ATODustTiny> LIST) {
+		Collections.sort(LIST, new Comparator<ATODustTiny>() {
+			@Override
+			public int compare(ATODustTiny o1, ATODustTiny o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATOCrushed> sortCrushedList(LinkedList<ATOCrushed> LIST) {
+		Collections.sort(LIST, new Comparator<ATOCrushed>() {
+			@Override
+			public int compare(ATOCrushed o1, ATOCrushed o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATOCrushedPurified> sortCrushedPurifiedList(LinkedList<ATOCrushedPurified> LIST) {
+		Collections.sort(LIST, new Comparator<ATOCrushedPurified>() {
+			@Override
+			public int compare(ATOCrushedPurified o1, ATOCrushedPurified o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATOBlock> sortBlockList(LinkedList<ATOBlock> LIST) {
+		Collections.sort(LIST, new Comparator<ATOBlock>() {
+			@Override
+			public int compare(ATOBlock o1, ATOBlock o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
+	public static LinkedList<ATOBrick> sortBrickList(LinkedList<ATOBrick> LIST) {
+		Collections.sort(LIST, new Comparator<ATOBrick>() {
+			@Override
+			public int compare(ATOBrick o1, ATOBrick o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+		return LIST;
+	}
+
 	public static boolean recipeExists(String type, String name) {
-		if(!OreDictionary.getOres(type + Utils.capitalize(name)).isEmpty())
+		if (!OreDictionary.getOres(type + Utils.capitalize(name)).isEmpty())
 			return true;
 		return false;
 	}

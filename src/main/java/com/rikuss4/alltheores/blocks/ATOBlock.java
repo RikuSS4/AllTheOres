@@ -19,6 +19,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import com.rikuss4.alltheores.reference.Reference;
 import com.rikuss4.alltheores.textures.BlockTexture;
 import com.rikuss4.alltheores.utility.LogHelper;
+import com.rikuss4.alltheores.utility.Utils;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
