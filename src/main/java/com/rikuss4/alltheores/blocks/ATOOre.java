@@ -6,6 +6,7 @@ import ic2.api.recipe.Recipes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +14,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockOre;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -20,9 +22,18 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ContainerWorkbench;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -53,6 +64,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import crazypants.enderio.machine.recipe.Recipe;
 
 public class ATOOre extends BlockOre {
 
@@ -140,18 +152,18 @@ public class ATOOre extends BlockOre {
 	public Boolean armorRecipe = true;
 
 	public ATOOre(String name, int color, int dropType, int dropMin, int dropMax, int hardness, int harvestLevel, int oreRenderType, String type, String underlyingBlockName, int veinRate, int veinSize, int veinHeight, List<Integer> dimWhiteList, List<Integer> dimBlackList, Boolean enableSmelt, Boolean enableMacerate, Boolean enableCrush, Boolean falls, Boolean useDust, Boolean base, ATOOre ore) {
-		// subTypes = Poor, Dense, Nether, End
-		this.subType = (type.toLowerCase().startsWith("poor") ? "poor" : (type.toLowerCase().startsWith("dense") ? "dense" : (type.toLowerCase().startsWith("nethernether") ? "nether" : (type.toLowerCase().startsWith("endend") ? "end" : ""))));
+		// subTypes = Poor, Dense
+		this.subType = (type.toLowerCase().startsWith("poor") ? "poor" : (type.toLowerCase().startsWith("dense") ? "dense" : ""));
 		// types = Sand, Gravel, Nether, End
 		this.type = (type.toLowerCase().endsWith("nether") ? "nether" : (type.toLowerCase().endsWith("end") ? "end" : (type.toLowerCase().endsWith("sand") ? "sand" : (type.toLowerCase().endsWith("gravel") ? "gravel" : ""))));
-		this.baseName = name;
+		this.baseName = Utils.capitalize(name).replaceAll(" ", "");
 		this.name = (this.subType.equals("") || this.subType.equals("nether") || this.subType.equals("end") ? "" : this.subType + "_") + name.replaceAll("__", "_").toLowerCase() + "_" + "ore";
 		this.color = color;
 		this.base = base;
 
 		LogHelper.mod_debug("*** Setup for " + this.name + " ***");
 		LogHelper.mod_debug("*** " + this.getUnlocalizedName() + " ***");
-		LogHelper.mod_debug("type: " + type);
+		LogHelper.mod_debug("full type: " + type);
 		LogHelper.mod_debug("type: " + this.type);
 		LogHelper.mod_debug("subType: " + this.subType);
 		this.dropType = dropType;
@@ -173,9 +185,8 @@ public class ATOOre extends BlockOre {
 		this.oreRenderType = oreRenderType;
 		this.falls = falls;
 		this.useDust = useDust;
-		this.oreDictName = (this.subType.equals("") && (this.type.equals("nether")) || (this.type.equals("end"))) ? "ore" + Utils.capitalize(this.type).replaceAll(" ", "") : "ore";
+		this.oreDictName = this.subType + ((this.type.equals("nether") || this.type.equals("end")) ? "ore" + Utils.capitalize(this.type).replaceAll(" ", "") : "ore");
 		this.oreDictName = this.oreDictName + Utils.capitalize(name).replaceAll(" ", "");
-		//this.oreDictName = (this.subType.equals("") ? "ore" : this.subType.equalsIgnoreCase("nether") ? "oreNether" : this.subType.equalsIgnoreCase("end") ? "oreEnd" : this.subType + "ore") + Utils.capitalize(name).replaceAll(" ", "");
 		LogHelper.mod_debug("oreDictName: " + this.oreDictName);
 
 		this.setBlockName(this.name);
@@ -475,19 +486,14 @@ public class ATOOre extends BlockOre {
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconRegister) {
 		if (iconRegister instanceof TextureMap) {
+			int renderType = (subType.equals("dense") ? oreDenseRenderType : (subType.equals("poor") ? orePoorRenderType : oreRenderType));
 			TextureMap map = (TextureMap) iconRegister;
-			String name = Reference.MOD_ID.toLowerCase() + ":" + this.name;
-			String prefix = this.subType.toLowerCase();
-
-			// if necessary remove prefix
-			if ((!prefix.equals("poor")) && (!prefix.equals("dense"))) {
-				prefix = "";
-			}
+			String name = Reference.MOD_ID.toLowerCase() + ":" + this.name + "_" + renderType;
 
 			// load texture from file or generate
 			TextureAtlasSprite texture = map.getTextureExtry(name);
 			if (texture == null) {
-				texture = new BlockTexture(name, prefix + "ore", 0, color, oreRenderType, this, false);
+				texture = new BlockTexture(name, type, subType + "ore", color, renderType, underlyingBlockName, false);
 				if (!map.setTextureEntry(name, texture)) {
 					LogHelper.error(name + ": Could not add texture after creation!");
 				}
@@ -496,12 +502,12 @@ public class ATOOre extends BlockOre {
 
 			// load overlay texture from file or generate
 			if (underlyingBlockName.equalsIgnoreCase("minecraft:stone")) {
-				name = Reference.MOD_ID.toLowerCase() + ":" + this.name + "_overlay";
+				name = name + "_overlay";
 				texture = map.getTextureExtry(name);
 				if (texture == null) {
-					texture = new BlockTexture(name, prefix + "ore", 0, color, oreRenderType, this, true);
+					texture = new BlockTexture(name, type, subType + "ore", color, renderType, underlyingBlockName, true);
 					if (!map.setTextureEntry(name, texture)) {
-						LogHelper.error(name + "_overlay: Could not add texture after creation!");
+						LogHelper.error(name + ": Could not add texture after creation!");
 					}
 				}
 			}
@@ -631,10 +637,10 @@ public class ATOOre extends BlockOre {
 
 	@Override
 	public int quantityDropped(int metadata, int fortune, Random random) {
-		LogHelper.mod_debug("Block Drop Min:" + getDropMin());
-		LogHelper.mod_debug("Block Drop Max:" + getDropMax());
-		LogHelper.mod_debug("Block Drop Type:" + dropType);
 		if (Utils.isBetween(dropType, 1, 6)) {
+			LogHelper.mod_debug("Block Drop Min:" + getDropMin());
+			LogHelper.mod_debug("Block Drop Max:" + getDropMax());
+			LogHelper.mod_debug("Block Drop Type:" + dropType);
 			int min = Math.min(getDropMin() + fortune, getDropMax());
 			int amt = MathHelper.getRandomIntegerInRange(rand, min, getDropMax());
 			LogHelper.mod_debug("Block Drop Amount:" + amt);
@@ -654,22 +660,6 @@ public class ATOOre extends BlockOre {
 		}
 		return exp;
 	}
-
-	/*
-	 * @Override
-	 * public void dropBlockAsItemWithChance(World world, int par1, int par2, int
-	 * par3, int par4, float par5, int par6) {
-	 * super.dropBlockAsItemWithChance(world, par1, par2, par3, par4, par5,
-	 * par6);
-	 * int xp = 0;
-	 * if (this.getItemDropped(par4, world.rand, par6) !=
-	 * Item.getItemFromBlock(this)) {
-	 * xp = MathHelper.getRandomIntegerInRange(world.rand, 1,
-	 * MathHelper.ceiling_double_int(this.getHarvestLevel(par4) * 2.5));
-	 * this.dropXpOnBlockBreak(world, par1, par2, par3, xp);
-	 * }
-	 * }
-	 */
 
 	private HashMap<Integer, int[]> particles = new HashMap<Integer, int[]>();
 
@@ -829,21 +819,30 @@ public class ATOOre extends BlockOre {
 					GameRegistry.addSmelting(input, output, 0.1f);
 					String[] inputInfo = Utils.getItemInfo(input);
 					if (this.ore == null && getIngot(1) != null && inputInfo[3] != null && inputInfo[3].startsWith("ingot")) {
-						output = getIngot(1);
-						input = getDust(1);
-						if (input != null && (input != output)) {
-							LogHelper.mod_debug("Smelt 2) " + input + " => " + output);
-							GameRegistry.addSmelting(input, output, 0.1f);
+						output = FurnaceRecipes.smelting().getSmeltingResult(new ItemStack(getDust().getItem(), 1, getDust().getItemDamage()));
+						if (output == null) {
+							output = getIngot();
+							input = getDust();
+							if (input != null && (input != output)) {
+								LogHelper.mod_debug("Smelt 2) " + input + " => " + output);
+								GameRegistry.addSmelting(input, output, 0.1f);
+							}
 						}
-						input = getCrushed(1);
-						if (input != null && (input != output)) {
-							LogHelper.mod_debug("Smelt 3) " + input + " => " + output);
-							GameRegistry.addSmelting(input, output, 0.1f);
+						output = FurnaceRecipes.smelting().getSmeltingResult(new ItemStack(getCrushed().getItem(), 1, getCrushed().getItemDamage()));
+						if (output == null) {
+							input = getCrushed(1);
+							if (input != null && (input != output)) {
+								LogHelper.mod_debug("Smelt 3) " + input + " => " + output);
+								GameRegistry.addSmelting(input, output, 0.1f);
+							}
 						}
-						input = getCrushedPurified(1);
-						if (input != null && (input != output)) {
-							LogHelper.mod_debug("Smelt 4) " + input + " => " + output);
-							GameRegistry.addSmelting(input, output, 0.1f);
+						output = FurnaceRecipes.smelting().getSmeltingResult(new ItemStack(getCrushedPurified().getItem(), 1, getCrushedPurified().getItemDamage()));
+						if (output == null) {
+							input = getCrushedPurified(1);
+							if (input != null && (input != output)) {
+								LogHelper.mod_debug("Smelt 4) " + input + " => " + output);
+								GameRegistry.addSmelting(input, output, 0.1f);
+							}
 						}
 					}
 				}
@@ -982,26 +981,28 @@ public class ATOOre extends BlockOre {
 				// Ingot ==> Block Crafting
 				String[] materialInfo = Utils.getItemInfo(material);
 				int i = 0;
-				for (String tmp : materialInfo) {
-					LogHelper.mod_debug("materialInfo(" + i + ")" + tmp);
-					i++;
-				}
-				if (materialInfo != null && !materialInfo[3].equals("") && material != null) {
-					LogHelper.mod_debug("Ore Dictionary: 9x " + materialInfo[0] + " " + materialInfo[3] + " ==> " + block.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3] }));
-					// GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn",
-					// "nnn", "nnn", 'n', outputInfo[3]));
-				} else if (block != null && material != null) {
-					LogHelper.mod_debug("9x " + material.getUnlocalizedName() + " ==> " + block.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { material, material, material, material, material, material, material, material, material }));
-					// GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn",
-					// "nnn", "nnn", 'n', output));
-				}
+				if (materialInfo != null) {
+					for (String tmp : materialInfo) {
+						LogHelper.mod_debug("materialInfo(" + i + ")" + tmp);
+						i++;
+					}
+					if (materialInfo != null && !materialInfo[3].equals("") && material != null) {
+						LogHelper.mod_debug("Ore Dictionary: 9x " + materialInfo[0] + " " + materialInfo[3] + " ==> " + block.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3], materialInfo[3] }));
+						// GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn",
+						// "nnn", "nnn", 'n', outputInfo[3]));
+					} else if (block != null && material != null) {
+						LogHelper.mod_debug("9x " + material.getUnlocalizedName() + " ==> " + block.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(block, new Object[] { material, material, material, material, material, material, material, material, material }));
+						// GameRegistry.addRecipe(new ShapedOreRecipe(input, "nnn",
+						// "nnn", "nnn", 'n', output));
+					}
 
-				// Block ==> Ingot Crafting
-				if (block != null) {
-					LogHelper.mod_debug(block.getUnlocalizedName() + " ==> 9x" + material.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(material.splitStack(9), new Object[] { block }));
+					// Block ==> Ingot Crafting
+					if (block != null) {
+						LogHelper.mod_debug(block.getUnlocalizedName() + " ==> 9x" + material.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(material.splitStack(9), new Object[] { block }));
+					}
 				}
 			}
 
@@ -1011,19 +1012,21 @@ public class ATOOre extends BlockOre {
 				ItemStack ingot = getIngot();
 				String[] ingotInfo = Utils.getItemInfo(ingot);
 
-				// Ingot ==> Brick Crafting
-				if (!ingotInfo[3].equals("")) {
-					LogHelper.mod_debug("Ore Dictionary: 4x " + ingotInfo[0] + " " + ingotInfo[3] + " ==> " + brick.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingotInfo[3], ingotInfo[3], ingotInfo[3], ingotInfo[3] }));
-				} else if (getIngot(1) != null) {
-					LogHelper.mod_debug("4x " + getIngot().getUnlocalizedName() + " ==> " + brick.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingot, ingot, ingot, ingot }));
-				}
+				if (ingotInfo != null) {
+					// Ingot ==> Brick Crafting
+					if (!ingotInfo[3].equals("")) {
+						LogHelper.mod_debug("Ore Dictionary: 4x " + ingotInfo[0] + " " + ingotInfo[3] + " ==> " + brick.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingotInfo[3], ingotInfo[3], ingotInfo[3], ingotInfo[3] }));
+					} else if (getIngot(1) != null) {
+						LogHelper.mod_debug("4x " + getIngot().getUnlocalizedName() + " ==> " + brick.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(brick, new Object[] { ingot, ingot, ingot, ingot }));
+					}
 
-				// Brick ==> Ingot Crafting
-				if (ingot != null) {
-					LogHelper.mod_debug(brick.getUnlocalizedName() + " ==> 4x " + ingot.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot.splitStack(4), new Object[] { brick }));
+					// Brick ==> Ingot Crafting
+					if (ingot != null) {
+						LogHelper.mod_debug(brick.getUnlocalizedName() + " ==> 4x " + ingot.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(ingot.splitStack(4), new Object[] { brick }));
+					}
 				}
 			}
 
@@ -1032,12 +1035,14 @@ public class ATOOre extends BlockOre {
 				ItemStack ingot = getIngot();
 				ItemStack nugget = getNugget();
 				String[] ingotInfo = Utils.getItemInfo(ingot);
-				if (ingot != nugget && !ingotInfo[3].equals("")) {
-					LogHelper.mod_debug("Ore Dictionary: " + ingotInfo[0] + " " + ingotInfo[3] + " ==> 9x " + nugget.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] { ingotInfo[3] }));
-				} else if (ingot != null && nugget != null) {
-					LogHelper.mod_debug("" + ingot.getUnlocalizedName() + " ==> 9x " + nugget.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] { ingot }));
+				if (ingotInfo != null) {
+					if (ingot != nugget && !ingotInfo[3].equals("")) {
+						LogHelper.mod_debug("Ore Dictionary: " + ingotInfo[0] + " " + ingotInfo[3] + " ==> 9x " + nugget.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] { ingotInfo[3] }));
+					} else if (ingot != null && nugget != null) {
+						LogHelper.mod_debug("" + ingot.getUnlocalizedName() + " ==> 9x " + nugget.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(nugget.splitStack(9), new Object[] { ingot }));
+					}
 				}
 			}
 
@@ -1046,14 +1051,16 @@ public class ATOOre extends BlockOre {
 				ItemStack nugget = getNugget();
 				ItemStack ingot = getIngot();
 				String[] nuggetInfo = Utils.getItemInfo(nugget);
-				if (nugget != ingot && !nuggetInfo[3].equals("")) {
-					LogHelper.mod_debug("Ore Dictionary: 9x " + nuggetInfo[0] + " " + nuggetInfo[3] + " ==> " + ingot.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] { nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3] }));
-					// GameRegistry.addRecipe(new ShapedOreRecipe(output, "nnn",
-					// "nnn", "nnn", 'n', inputInfo[3]));
-				} else if (nugget != null && ingot != null) {
-					LogHelper.mod_debug("9x " + nugget.getUnlocalizedName() + " ==> " + ingot.getUnlocalizedName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] { nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget }));
+				if (nuggetInfo != null) {
+					if (nugget != ingot && !nuggetInfo[3].equals("")) {
+						LogHelper.mod_debug("Ore Dictionary: 9x " + nuggetInfo[0] + " " + nuggetInfo[3] + " ==> " + ingot.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] { nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3], nuggetInfo[3] }));
+						// GameRegistry.addRecipe(new ShapedOreRecipe(output, "nnn",
+						// "nnn", "nnn", 'n', inputInfo[3]));
+					} else if (nugget != null && ingot != null) {
+						LogHelper.mod_debug("9x " + nugget.getUnlocalizedName() + " ==> " + ingot.getUnlocalizedName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(ingot, new Object[] { nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget }));
+					}
 				}
 			}
 
@@ -1062,12 +1069,14 @@ public class ATOOre extends BlockOre {
 				ItemStack dust = getDust();
 				ItemStack dustTiny = getDustTiny();
 				String[] dustInfo = Utils.getItemInfo(dust);
-				if (dust != dustTiny && !dustInfo[3].equals("")) {
-					LogHelper.mod_debug("Ore Dictionary: " + dustInfo[0] + " " + dustInfo[3] + " ==> 9x " + dustTiny.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] { dustInfo[3] }));
-				} else if (dust != null && dustTiny != null) {
-					LogHelper.mod_debug("" + dust.getDisplayName() + " ==> 9x " + dustTiny.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] { dust }));
+				if (dustInfo != null) {
+					if (dust != dustTiny && !dustInfo[3].equals("")) {
+						LogHelper.mod_debug("Ore Dictionary: " + dustInfo[0] + " " + dustInfo[3] + " ==> 9x " + dustTiny.getDisplayName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] { dustInfo[3] }));
+					} else if (dust != null && dustTiny != null) {
+						LogHelper.mod_debug("" + dust.getDisplayName() + " ==> 9x " + dustTiny.getDisplayName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(dustTiny.splitStack(9), new Object[] { dust }));
+					}
 				}
 			}
 
@@ -1076,12 +1085,14 @@ public class ATOOre extends BlockOre {
 				ItemStack dustTiny = getDustTiny();
 				ItemStack dust = getDust();
 				String[] dustTinyInfo = Utils.getItemInfo(dustTiny);
-				if (dustTiny != dust && !dustTinyInfo[3].equals("")) {
-					LogHelper.mod_debug("Ore Dictionary: 9x " + dustTinyInfo[0] + " " + dustTinyInfo[3] + " ==> " + dust.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] { dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3] }));
-				} else if (dustTiny != null && dust != null) {
-					LogHelper.mod_debug("9x " + dustTiny.getDisplayName() + " ==> " + dust.getDisplayName());
-					GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] { dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny }));
+				if (dustTinyInfo != null) {
+					if (dustTiny != dust && !dustTinyInfo[3].equals("")) {
+						LogHelper.mod_debug("Ore Dictionary: 9x " + dustTinyInfo[0] + " " + dustTinyInfo[3] + " ==> " + dust.getDisplayName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] { dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3], dustTinyInfo[3] }));
+					} else if (dustTiny != null && dust != null) {
+						LogHelper.mod_debug("9x " + dustTiny.getDisplayName() + " ==> " + dust.getDisplayName());
+						GameRegistry.addRecipe(new ShapelessOreRecipe(dust, new Object[] { dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny, dustTiny }));
+					}
 				}
 			}
 
@@ -1180,35 +1191,6 @@ public class ATOOre extends BlockOre {
 		}
 	}
 
-	public ItemStack getDictName(String suffix, String... names) {
-		ItemStack item = null;
-		for (String name : names) {
-			item = Utils.getOreDict(name + suffix);
-			if (item != null) {
-				return item;
-			}
-		}
-		if (suffix.toLowerCase().startsWith(subType)) {
-			suffix = suffix.substring(subType.length());
-			for (String name : names) {
-				item = Utils.getOreDict(name + suffix);
-				if (item != null) {
-					return item;
-				}
-			}
-		}
-		if (suffix.toLowerCase().startsWith(type)) {
-			suffix = suffix.substring(type.length());
-			for (String name : names) {
-				item = Utils.getOreDict(name + suffix);
-				if (item != null) {
-					return item;
-				}
-			}
-		}
-		return null;
-	}
-
 	public void setIngot(ItemStack item) {
 		this.ingotItem = item;
 	}
@@ -1270,6 +1252,13 @@ public class ATOOre extends BlockOre {
 	}
 
 	/**
+	 * Clears the ore smelting output.
+	 */
+	public void clearSmeltingOutput() {
+		smeltingOutputItem = null;
+	}
+
+	/**
 	 * Sets the ore smelting output.
 	 *
 	 * @param item
@@ -1277,14 +1266,6 @@ public class ATOOre extends BlockOre {
 	 */
 	public void setSmeltingOutput(ItemStack item) {
 		setSmeltingOutput("", item);
-	}
-
-	public void setSmeltingOutput(int smeltAmount) {
-		setSmeltingOutput("", new ItemStack(this, 0, smeltAmount));
-	}
-
-	public void setSmeltingOutput() {
-		setSmeltingOutput("", new ItemStack(this, 0, smeltAmount));
 	}
 
 	/**
@@ -1302,13 +1283,6 @@ public class ATOOre extends BlockOre {
 			ItemStack newItem = Utils.getItemStack(name);
 			if (newItem != null) {
 				smeltingOutputItem = newItem;
-			} else if (oreDictName != null && Reference.useOreDictForItems) {
-				newItem = getDictName(oreDictName.substring(3), (useDust() ? "dust" : "ingot"), "gem");
-				if (newItem != null) {
-					this.smeltingOutputItem = newItem;
-				} else {
-					this.smeltingOutputItem = null;
-				}
 			}
 		}
 	}
@@ -1380,7 +1354,7 @@ public class ATOOre extends BlockOre {
 					} else {
 						dropType = 0;
 						setOreValues(1, 1, 8, 16, 16);
-						setSmeltingOutput(smeltAmount);
+						clearSmeltingOutput();
 					}
 				}
 			} else {
@@ -1396,7 +1370,7 @@ public class ATOOre extends BlockOre {
 					} else {
 						dropType = 6;
 						setOreValues(3, 3, 3, 6, 6);
-						setSmeltingOutput(smeltAmount);
+						clearSmeltingOutput();
 					}
 				}
 			}
@@ -1414,7 +1388,7 @@ public class ATOOre extends BlockOre {
 					} else {
 						dropType = 0;
 						setOreValues(1, 1, 4, 8, 8);
-						setSmeltingOutput(smeltAmount);
+						clearSmeltingOutput();
 					}
 				}
 			} else {
@@ -1499,6 +1473,82 @@ public class ATOOre extends BlockOre {
 	}
 
 	public void removeCrafting(ATOOre ore) {
+		if ((ore.useDust() && ore.getDust() != null) || ((!ore.useDust()) && ore.getIngot() != null)) {
+		}
+
+		//@formatter:off
+		/*
+		InventoryCrafting fakeInv = new InventoryCrafting(new ContainerWorkbench(null, null, 0, 0, 0), 3, 3);
+		for(int i = 0; i < 9; i++)
+			fakeInv.setInventorySlotContents(i, ore.useDust() ? ore.getDust(): ore. getIngot());
+		ItemStack result = CraftingManager.getInstance().findMatchingRecipe(fakeInv, null);
+		LogHelper.debug("result: " + result);
+		 */
+		//@formatter:on
+
+		List<IRecipe> recipies = CraftingManager.getInstance().getRecipeList();
+		Iterator<IRecipe> remover = recipies.iterator();
+		String oreDict = (ore.useDust() ? "dust" : "ingot") + ore.baseName;
+		// ShapedRecipes recipeToMatch = new ShapedRecipes(3, 3, (ItemStack[]) new
+		// Object[] {oreDict, oreDict, oreDict, oreDict, oreDict, oreDict,
+		// oreDict, oreDict, oreDict, oreDict}, ore.getBlock());
+		while (remover.hasNext()) {
+			IRecipe output = remover.next();
+			ItemStack itemOutput = output.getRecipeOutput();
+
+			if (itemOutput != null) {
+				if (Reference.CONFIG_ADD_CRAFTING_BLOCKS && ore.blockRecipe && ore.getBlock() != null) {
+					if (itemOutput.isItemEqual(ore.getBlock(1))) {
+						LogHelper.debug("Match Found: " + itemOutput + " = " + ore.getBlock(1));
+						if (output instanceof ShapelessRecipes) {
+							ShapelessRecipes shapelessOutput = (ShapelessRecipes) output;
+							int i=1;
+							for (Object item : shapelessOutput.recipeItems) {
+								LogHelper.debug("shapelessInput("+i+"): " + item);
+								i++;
+							}
+						} else if (output instanceof ShapelessOreRecipe) {
+								ShapelessOreRecipe shapelessOreOutput = (ShapelessOreRecipe) output;
+								int i=1;
+								for (Object item : shapelessOreOutput.getInput()) {
+									LogHelper.debug("shapelessOreInput("+i+"): " + item);
+									i++;
+								}
+						} else if (output instanceof ShapedRecipes) {
+							ShapedRecipes shapedOutput = (ShapedRecipes) output;
+							int i=1;
+							for (ItemStack item : shapedOutput.recipeItems) {
+								LogHelper.debug("shapedInput("+i+"): " + item);
+								i++;
+							}
+						} else if (output instanceof ShapedOreRecipe) {
+							ShapedOreRecipe shapedOreOutput = (ShapedOreRecipe) output;
+							int i=1;
+							for (Object item : shapedOreOutput.getInput()) {
+								LogHelper.debug("shapedOreRecipe("+i+"): " + item);
+								i++;
+							}
+						} else {
+							LogHelper.debug("output: " + output);
+						}
+						remover.remove();
+					}
+				}
+				if (Reference.CONFIG_ADD_CRAFTING_INGOTS && ore.ingotRecipe && ore.getIngot() != null) {
+					if (itemOutput.isItemEqual(ore.getIngot(1))) {
+						remover.remove();
+					}
+				}
+				if (Reference.CONFIG_ADD_CRAFTING_DUSTS && ore.dustRecipe && ore.getDust() != null) {
+					if (itemOutput.isItemEqual(ore.getDust(1))) {
+						remover.remove();
+					}
+				}
+			}
+		}
+	}
+
+	public void removeCrafting2(ATOOre ore) {
 		// Section: Remove Crafting
 		try {
 			if (crushed != null)
