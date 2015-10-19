@@ -58,7 +58,7 @@ public class BlockTexture extends TextureAtlasSprite {
 			LogHelper.info("Override detected for " + location.getResourcePath() + " in " + location.getResourceDomain() + ".");
 			return false;
 		} catch (IOException e) {
-			LogHelper.debug("No override detected for " + location.getResourcePath() + " in " + location.getResourceDomain() + ".");
+			//LogHelper.debug("No override detected for " + location.getResourcePath() + " in " + location.getResourceDomain() + ".");
 			return true;
 		}
 	}

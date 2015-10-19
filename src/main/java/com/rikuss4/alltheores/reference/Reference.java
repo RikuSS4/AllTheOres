@@ -21,10 +21,10 @@ import cpw.mods.fml.common.Loader;
 public class Reference {
 	public static final String MOD_ID = "AllTheOres";
 	public static final String MOD_NAME = "All The Ores";
-	public static final String VERSION = "0.1.7";
+	public static final String VERSION = "0.1.8";
 	//public static final String DEPS = "after:IC2;after:EnderIO;after:TConstruct;after:ThermalFoundation;after:Metallurgy;before:aobd";
 	//public static final String DEPS = "before:UndergroundBiomes;after:*;after:aobd";
-	public static final String DEPS = "before:UndergroundBiomes;after:IC2;after:EnderIO;after:TConstruct;after:ThermalFoundation;after:Metallurgy;before:aobd";
+	public static final String DEPS = "after:UndergroundBiomes;after:IC2;after:Metallurgy;after:ThermalFoundation;after:Mekanism;after:GalacticraftCore;after:EnderIO;after:TConstruct;after:MCA;before:aobd";
 	public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ":";
 	public static final String CONFIG_PREFIX = ".";
 	public static final Boolean DEBUG = (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment");

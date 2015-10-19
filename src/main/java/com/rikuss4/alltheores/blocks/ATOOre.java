@@ -156,7 +156,7 @@ public class ATOOre extends BlockOre {
 		this.subType = (type.toLowerCase().startsWith("poor") ? "poor" : (type.toLowerCase().startsWith("dense") ? "dense" : ""));
 		// types = Sand, Gravel, Nether, End
 		this.type = (type.toLowerCase().endsWith("nether") ? "nether" : (type.toLowerCase().endsWith("end") ? "end" : (type.toLowerCase().endsWith("sand") ? "sand" : (type.toLowerCase().endsWith("gravel") ? "gravel" : ""))));
-		this.baseName = Utils.capitalize(name).replaceAll(" ", "");
+		this.baseName = Utils.capitalize(name).replaceAll(" ", "_");
 		this.name = (this.subType.equals("") || this.subType.equals("nether") || this.subType.equals("end") ? "" : this.subType + "_") + name.replaceAll("__", "_").toLowerCase() + "_" + "ore";
 		this.color = color;
 		this.base = base;
