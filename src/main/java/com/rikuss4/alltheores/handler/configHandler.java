@@ -123,6 +123,11 @@ public class configHandler {
 		Reference.PreferredOrder.add("IC2");
 		Reference.PreferredOrder.add("Metallurgy");
 		Reference.PreferredOrder.add("ThermalFoundation");
+		Reference.PreferredOrder.add("Mekanism");
+		Reference.PreferredOrder.add("GalacticraftCore");
+		Reference.PreferredOrder.add("EnderIO");
+		Reference.PreferredOrder.add("TConstruct");
+		Reference.PreferredOrder.add("MCA");
 
 		// Make Ores folder if it does not exist
 		File dir = new File(configDir + "/Ores");
@@ -481,8 +486,10 @@ public class configHandler {
 							ATOOre ore = new ATOOre(oreName, oreColor, oreDropType, oreDropMin, oreDropMax, 2, oreHarvestLevel, oreRenderType, oreType, underlyingBlockName, veinRate, veinSize, veinHeight, dimWhiteList, dimBlackList, smeltEnable, maceratingEnable, crushingEnable, oreFalls, outputDust, true, null);
 							ore.oreDenseRenderType = (oreDenseRenderType < 0) ? oreRenderType : oreDenseRenderType;
 							ore.orePoorRenderType = (orePoorRenderType < 0) ? oreRenderType : orePoorRenderType;
+							LogHelper.mod_debug("");
 
 							// Section: Ingot setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Ingot");
 							String ingotName = "";
 							String ingotType = "ingot";
 							String ingotOreDictList = "";
@@ -513,18 +520,26 @@ public class configHandler {
 							}
 							// Register Ingot
 							if (ingotEnable && oreType.equals("")) {
-								ingotOreDictList = (ingotOreDictList.equalsIgnoreCase("") ? ingotType : ingotOreDictList);
-								List<String> ingotOreDictListArray = new ArrayList<String>(Arrays.asList(ingotOreDictList.split("\\s*,\\s*")));
+								ItemStack oreDictIngot = Utils.getOreDict(ingotType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 								ItemStack ingot = Utils.getItemStack(ingotName, ingotMeta);
-								if (!ingotForce && ingot != null) {
+								if (!ingotForce && oreDictIngot != null && Reference.useOreDictForItems) {
+									ore.setIngot(oreDictIngot);
+									LogHelper.mod_debug("oreDictIngot: " + oreDictIngot.getUnlocalizedName());
+								} else if (!ingotForce && ingot != null) {
 									ore.setIngot(ingot);
+									LogHelper.mod_debug("ingot: " + ingot.getUnlocalizedName());
 								} else {
+									ingotOreDictList = (ingotOreDictList.equalsIgnoreCase("") ? ingotType : ingotOreDictList);
+									List<String> ingotOreDictListArray = new ArrayList<String>(Arrays.asList(ingotOreDictList.split("\\s*,\\s*")));
 									ATOIngot = new ATOIngot(oreName, ore, (ingotColor < 0) ? oreColor : ingotColor, ingotType, ingotOreDictListArray, ingotRenderType, ingotBurnTime);
-									ore.setIngot(new ItemStack(ATOIngot).copy());
+									ore.setIngot(new ItemStack(ATOIngot));
+									LogHelper.mod_debug("ATOIngot: " + ATOIngot.getBaseName());
 								}
 							}
+							LogHelper.mod_debug("");
 
 							// Section: Nugget setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Nugget");
 							String nuggetName = "";
 							String nuggetType = "nugget";
 							String nuggetOreDictList = "";
@@ -555,18 +570,26 @@ public class configHandler {
 							}
 							// Register Nugget
 							if (nuggetEnable && oreType.equals("")) {
-								nuggetOreDictList = (nuggetOreDictList.equalsIgnoreCase("") ? nuggetType : nuggetOreDictList);
-								List<String> nuggetOreDictListArray = new ArrayList<String>(Arrays.asList(nuggetOreDictList.split("\\s*,\\s*")));
+								ItemStack oreDictNugget = Utils.getOreDict(nuggetType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 								ItemStack nugget = Utils.getItemStack(nuggetName, nuggetMeta);
-								if (!nuggetForce && nugget != null)
+								if (!nuggetForce && oreDictNugget != null && Reference.useOreDictForItems) {
+									ore.setNugget(oreDictNugget);
+									LogHelper.mod_debug("oreDictNugget: " + oreDictNugget.getUnlocalizedName());
+								} else if (!nuggetForce && nugget != null) {
 									ore.setNugget(nugget);
-								else {
+									LogHelper.mod_debug("nugget: " + nugget.getUnlocalizedName());
+								} else {
+									nuggetOreDictList = (nuggetOreDictList.equalsIgnoreCase("") ? nuggetType : nuggetOreDictList);
+									List<String> nuggetOreDictListArray = new ArrayList<String>(Arrays.asList(nuggetOreDictList.split("\\s*,\\s*")));
 									ATONugget = new ATONugget(oreName, ore, (nuggetColor < 0) ? oreColor : nuggetColor, nuggetType, nuggetOreDictListArray, nuggetRenderType, nuggetBurnTime);
 									ore.setNugget(new ItemStack(ATONugget));
+									LogHelper.mod_debug("ATONugget: " + ATONugget.getUnlocalizedName());
 								}
 							}
+							LogHelper.mod_debug("");
 
 							// Section: Dust setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Dust");
 							int dustRenderType = 0;
 							int dustBurnTime = 0;
 							int dustColor = -1;
@@ -601,18 +624,26 @@ public class configHandler {
 							}
 							// Register Dust
 							if (dustEnable && oreType.equals("")) {
-								dustOreDictList = (dustOreDictList.equalsIgnoreCase("") ? dustType : dustOreDictList);
-								List<String> dustOreDictListArray = new ArrayList<String>(Arrays.asList(dustOreDictList.split("\\s*,\\s*")));
+								ItemStack oreDictDust = Utils.getOreDict(dustType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 								ItemStack dust = Utils.getItemStack(dustName, dustMeta);
-								if (!dustForce && dust != null)
-									ore.setDust(dust);
-								else {
+								if (!dustForce && oreDictDust != null && Reference.useOreDictForItems) {
+										ore.setDust(oreDictDust);
+										LogHelper.mod_debug("oreDictDust: " + oreDictDust.getUnlocalizedName());
+								} else if (!dustForce && dust != null) {
+										ore.setDust(dust);
+										LogHelper.mod_debug("dust: " + dust.getUnlocalizedName());
+								} else {
+									dustOreDictList = (dustOreDictList.equalsIgnoreCase("") ? dustType : dustOreDictList);
+									List<String> dustOreDictListArray = new ArrayList<String>(Arrays.asList(dustOreDictList.split("\\s*,\\s*")));
 									ATODust = new ATODust(oreName, ore, (dustColor < 0) ? oreColor : dustColor, dustType, dustOreDictListArray, dustRenderType, dustBurnTime);
 									ore.setDust(new ItemStack(ATODust));
+									LogHelper.mod_debug("ATODust: " + ATODust.getUnlocalizedName());
 								}
 							}
+							LogHelper.mod_debug("");
 
 							// Section: Dust Tiny setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Dust Tiny");
 							int dustTinyRenderType = 0;
 							int dustTinyBurnTime = 0;
 							int dustTinyColor = -1;
@@ -628,7 +659,7 @@ public class configHandler {
 								dustTinyMeta = config.get(category, "dustTinyMeta", -1).getInt();
 							}
 							if (config.hasKey(category, "dustTinyType")) {
-								dustType = config.get(category, "dustTinyType", "dustTiny").getString();
+								dustTinyType = config.get(category, "dustTinyType", "dustTiny").getString();
 							}
 							if (config.hasKey(category, "dustTinyOreDictList")) {
 								dustTinyOreDictList = config.get(category, "dustTinyOreDictList", "").getString();
@@ -644,18 +675,26 @@ public class configHandler {
 							}
 							// Register Tiny Dust
 							if (dustTinyEnable && oreType.equals("")) {
-								dustTinyOreDictList = (dustTinyOreDictList.isEmpty() ? dustTinyType : dustTinyOreDictList);
-								List<String> dustTinyOreDictListArray = new ArrayList<String>(Arrays.asList(dustTinyOreDictList.split("\\s*,\\s*")));
+								ItemStack oreDictDustTiny = Utils.getOreDict(dustTinyType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 								ItemStack dustTiny = Utils.getItemStack(dustTinyName, dustTinyMeta);
-								if (!dustTinyForce && dustTiny != null)
-									ore.setDustTiny(dustTiny);
-								else {
+								if (!dustTinyForce && oreDictDustTiny != null && Reference.useOreDictForItems) {
+										ore.setDustTiny(oreDictDustTiny);
+										LogHelper.mod_debug("oreDictDustTiny: " + oreDictDustTiny.getUnlocalizedName());
+								} else if (!dustTinyForce && dustTiny != null) {
+										ore.setDustTiny(dustTiny);
+										LogHelper.mod_debug("dustTiny: " + dustTiny.getUnlocalizedName());
+								} else {
+									dustTinyOreDictList = (dustTinyOreDictList.isEmpty() ? dustTinyType : dustTinyOreDictList);
+									List<String> dustTinyOreDictListArray = new ArrayList<String>(Arrays.asList(dustTinyOreDictList.split("\\s*,\\s*")));
 									ATODustTiny = new ATODustTiny(oreName, ore, (dustTinyColor < 0) ? oreColor : dustTinyColor, dustTinyType, dustTinyOreDictListArray, dustTinyRenderType, dustTinyBurnTime);
 									ore.setDustTiny(new ItemStack(ATODustTiny));
+									LogHelper.mod_debug("ATODustTiny: " + ATODustTiny.getUnlocalizedName());
 								}
 							}
+							LogHelper.mod_debug("");
 
 							// Section: Crushed Ore setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Crushed");
 							int crushedRenderType = 0;
 							int crushedBurnTime = 0;
 							int crushedColor = -1;
@@ -688,7 +727,9 @@ public class configHandler {
 							if (config.hasKey(category, "crushedColor")) {
 								crushedColor = Utils.intFromHex(config.get(category, "crushedColor", "000000").getString());
 							}
+
 							// Section: Purified Crushed Ore setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Crushed Purified");
 							int crushedPurifiedRenderType = 0;
 							int crushedPurifiedBurnTime = 0;
 							int crushedPurifiedColor = -1;
@@ -720,47 +761,58 @@ public class configHandler {
 							// Register Crushed Ore
 							if (Loader.isModLoaded("IC2") && oreType.equals("")) {
 								if (crushedEnable) {
-									Boolean oreFound = false;
-									for (ItemStack oreDictOre : OreDictionary.getOres(ore.oreDictName)) {
-										if (Recipes.macerator.getOutputFor(oreDictOre, true) == null) {
-											// oreFound = oreDictOre;
-											break;
-										}
-									}
 									if (Recipes.macerator.getOutputFor(new ItemStack(ore, 1), true) == null) {
+										ItemStack oreDictCrushed = Utils.getOreDict(crushedType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 										ItemStack crushed = Utils.getItemStack(crushedName, crushedMeta);
-										if (!crushedForce && crushed != null)
-											ore.setCrushed(crushed);
-										else {
+										if (!crushedForce && oreDictCrushed != null && Reference.useOreDictForItems) {
+												ore.setCrushed(oreDictCrushed);
+												LogHelper.mod_debug("oreDictCrushed: " + oreDictCrushed.getUnlocalizedName());
+										} else if (!crushedForce && crushed != null) {
+												ore.setCrushed(crushed);
+												LogHelper.mod_debug("crushed: " + crushed.getUnlocalizedName());
+										} else {
 											crushedOreDictList = (crushedOreDictList.isEmpty() ? crushedType : crushedOreDictList);
 											List<String> crushedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedOreDictList.split("\\s*,\\s*")));
 											ATOCrushed = new ATOCrushed(oreName, ore, (crushedColor < 0) ? oreColor : crushedColor, crushedType, crushedOreDictListArray, crushedRenderType, crushedBurnTime);
 											ore.setCrushed(new ItemStack(ATOCrushed));
+											LogHelper.mod_debug("ATOCrushed: " + ATOCrushed.getUnlocalizedName());
 										}
 									}
 									// Register Crushed Purified Ore
 									if (Recipes.oreWashing.getOutputFor(ore.getCrushed(1), true) == null) {
+										ItemStack oreDictCrushedPurified = Utils.getOreDict(crushedPurifiedType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 										ItemStack crushedPurified = Utils.getItemStack(crushedPurifiedName, crushedPurifiedMeta);
-										if (!crushedPurifiedForce && crushedPurified != null)
-											ore.setCrushedPurified(crushedPurified);
-										else {
+										if (!crushedPurifiedForce && oreDictCrushedPurified != null && Reference.useOreDictForItems) {
+												ore.setCrushedPurified(oreDictCrushedPurified);
+												LogHelper.mod_debug("oreDictCrushedPurified: " + oreDictCrushedPurified.getUnlocalizedName());
+										} else if (!crushedPurifiedForce && crushedPurified != null) {
+												ore.setCrushedPurified(crushedPurified);
+												LogHelper.mod_debug("crushedPurified: " + crushedPurified.getUnlocalizedName());
+										} else {
 											crushedPurifiedOreDictList = (crushedPurifiedOreDictList.isEmpty() ? crushedPurifiedType : crushedPurifiedOreDictList);
 											List<String> crushedPurifiedOreDictListArray = new ArrayList<String>(Arrays.asList(crushedPurifiedOreDictList.split("\\s*,\\s*")));
 											ATOCrushedPurified = new ATOCrushedPurified(oreName, ore, (crushedPurifiedColor < 0) ? oreColor : crushedPurifiedColor, crushedPurifiedType, crushedPurifiedOreDictListArray, crushedPurifiedRenderType, crushedPurifiedBurnTime);
 											ore.setCrushedPurified(new ItemStack(ATOCrushedPurified));
+											LogHelper.mod_debug("ATOCrushedPurified: " + ATOCrushedPurified.getUnlocalizedName());
 										}
 									}
 								}
 							}
+							LogHelper.mod_debug("");
 
 							// Section: Block setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Block");
 							String blockName = "";
+							String blockType = "block";
 							int blockRenderType = 0;
 							int blockBurnTime = 0;
 							int blockColor = -1;
 							int blockMeta = -1;
 							if (config.hasKey(category, "block")) {
 								blockName = config.get(category, "block", "").getString();
+							}
+							if (config.hasKey(category, "blockType")) {
+								blockType = config.get(category, "blockType", "block").getString();
 							}
 							if (config.hasKey(category, "blockMeta")) {
 								blockMeta = config.get(category, "blockMeta", -1).getInt();
@@ -776,23 +828,35 @@ public class configHandler {
 							}
 							// Register Block
 							if (blockEnable && (oreType.equals("") || oreType.equals("ingot") || oreType.equals("gem"))) {
+								ItemStack oreDictBlock = Utils.getOreDict(blockType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 								ItemStack block = Utils.getItemStack(blockName, blockMeta);
-								if (!blockForce && block != null)
-									ore.setBlock(block);
-								else {
+								if (!blockForce && oreDictBlock != null && Reference.useOreDictForItems) {
+										ore.setBlock(oreDictBlock);
+										LogHelper.mod_debug("oreDictBlock: " + oreDictBlock.getUnlocalizedName());
+								} else if (!blockForce && block != null) {
+										ore.setBlock(block);
+										LogHelper.mod_debug("block: " + block.getUnlocalizedName());
+								} else {
 									ATOBlock = new ATOBlock(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : blockColor, blockRenderType, blockBurnTime);
 									ore.setBlock(new ItemStack(ATOBlock));
+									LogHelper.mod_debug("ATOBlock: " + ATOBlock.getUnlocalizedName());
 								}
 							}
+							LogHelper.mod_debug("");
 
 							// Section: Brick setup
+							LogHelper.mod_debug("*** " + Utils.capitalize(oreName) + " Brick");
 							String brickName = "";
+							String brickType = "brick";
 							int brickRenderType = 0;
 							int brickBurnTime = 0;
 							int brickColor = -1;
 							int brickMeta = -1;
 							if (config.hasKey(category, "brick")) {
 								brickName = config.get(category, "brick", "").getString();
+							}
+							if (config.hasKey(category, "brickType")) {
+								brickType = config.get(category, "brickType", "brick").getString();
 							}
 							if (config.hasKey(category, "brickMeta")) {
 								brickMeta = config.get(category, "brickMeta", -1).getInt();
@@ -808,12 +872,18 @@ public class configHandler {
 							}
 							// Register Brick
 							if (brickEnable && (oreType.equals("") || oreType.equals("ingot") || oreType.equals("gem"))) {
+								ItemStack oreDictBrick = Utils.getOreDict(brickType + Utils.capitalize(oreName.replaceAll(" ", "").replaceAll(" _","")));
 								ItemStack brick = Utils.getItemStack(brickName, brickMeta);
-								if (!brickForce && brick != null)
-									ore.setBlock(brick);
-								else {
+								if (!brickForce && oreDictBrick != null && Reference.useOreDictForItems) {
+										ore.setBrick(oreDictBrick);
+										LogHelper.mod_debug("oreDictBrick: " + oreDictBrick.getUnlocalizedName());
+								} else if (!brickForce && brick != null) {
+										ore.setBrick(brick);
+										LogHelper.mod_debug("brick: " + brick.getUnlocalizedName());
+								} else {
 									ATOBrick = new ATOBrick(oreName, ore, (blockColor < 0) ? ((ingotColor < 0) ? oreColor : ingotColor) : brickColor, brickRenderType, brickBurnTime);
 									ore.setBrick(new ItemStack(ATOBrick));
+									LogHelper.mod_debug("ATOBrick: " + ATOBrick.getUnlocalizedName());
 								}
 							}
 
@@ -901,6 +971,30 @@ public class configHandler {
 								Reference.BLOCK_LIST.add(ATOBlock);
 							if (ATOBrick != null && brickEnable)
 								Reference.BRICK_LIST.add(ATOBrick);
+							// Debug
+							if (Reference.DEBUG && ore != null) {
+								try {
+									if (ore.ingotItem != null && ore.ingotItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.ingotItem.getUnlocalizedName());
+									if (ore.nuggetItem != null && ore.nuggetItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.nuggetItem.getUnlocalizedName());
+									if (ore.dustItem != null && ore.dustItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.dustItem.getUnlocalizedName());
+									if (ore.dustTinyItem != null && ore.dustTinyItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.dustTinyItem.getUnlocalizedName());
+									if (ore.crushedItem != null && ore.crushedItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.crushedItem.getUnlocalizedName());
+									if (ore.crushedPurifiedItem != null && ore.crushedPurifiedItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.crushedPurifiedItem.getUnlocalizedName());
+									if (ore.blockItem != null && ore.blockItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.blockItem.getUnlocalizedName());
+									if (ore.brickItem != null && ore.brickItem.getUnlocalizedName() != null)
+										LogHelper.debug(ore.brickItem.getUnlocalizedName());
+								} catch (NullPointerException e) {
+									LogHelper.debug(ore);
+									e.printStackTrace();
+								}
+							}
 						} else {
 							LogHelper.warn(oreName + ": Underlying Block \"" + underlyingBlockName + "\" not found.");
 							LogHelper.warn(oreName + ": Ore will not be added.");

@@ -113,16 +113,7 @@ public class Utils {
 	public static ItemStack getItemStack(String itemName, int itemMeta, int stackSize) {
 		if (itemName == null)
 			return null;
-		LogHelper.mod_debug("getItemStack() {");
-		LogHelper.mod_debug("itemName: " + itemName);
-		LogHelper.mod_debug("itemMeta: " + itemMeta);
-		// if ((Item) Item.itemRegistry.getObject(itemName + ":" + itemMeta) !=
-		// null)
-		// return new ItemStack((Item) Item.itemRegistry.getObject(itemName + ":"
-		// + itemMeta), stackSize);
-		// else
-		// return new ItemStack((Item) Item.itemRegistry.getObject(itemName),
-		// stackSize);
+
 		itemName = itemName.trim();
 		String[] item = itemName.split(":", 3);
 
@@ -137,39 +128,15 @@ public class Utils {
 				item[0] = item[0] + ":" + item[i];
 		}
 
-		for (int i = 0; i < item.length; i++)
-			LogHelper.mod_debug("item[" + i + "]: " + item[i]);
-		LogHelper.mod_debug("itemMeta: " + itemMeta);
-
-		LogHelper.mod_debug("}");
-		if ((Item) Item.itemRegistry.getObject(item[0]) != null)
+		if (((Item) Item.itemRegistry.getObject(item[0])) != null) {
+			LogHelper.mod_debug("getItemStack() {");
+			LogHelper.mod_debug(" itemName: " + itemName);
+			for (int i = 0; i < item.length; i++)
+				LogHelper.mod_debug(" item[" + i + "]: " + item[i]);
+			LogHelper.mod_debug(" itemMeta: " + itemMeta);
+			LogHelper.mod_debug("}");
 			return new ItemStack((Item) Item.itemRegistry.getObject(item[0]), stackSize, itemMeta);
-		/*
-		 * } else if (item.length > 2) {
-		 * if (item[2].lastIndexOf(":") >= 0 &&
-		 * Utils.isInteger(item[2].substring(item[2].lastIndexOf(":") + 1))) {
-		 * meta = Integer.parseInt(item[2].substring(item[2].lastIndexOf(":") +
-		 * 1));
-		 * item[1] = item[1] + ":" + item[2].substring(0,
-		 * item[2].lastIndexOf(":"));
-		 * } else {
-		 * item[1] = item[1] + ":" + item[2];
-		 * }
-		 * }
-		 * if (item.length > 1 && GameRegistry.findItem(item[0], item[1]) != null)
-		 * {
-		 * if (meta > 0) {
-		 * return new ItemStack(GameRegistry.findItem(item[0], item[1]),
-		 * stackSize, meta);
-		 * } else {
-		 * return new ItemStack(GameRegistry.findItem(item[0], item[1]),
-		 * stackSize);
-		 * }
-		 * } else if (GameRegistry.findItem("minecraft", item[0]) != null) {
-		 * return new ItemStack(GameRegistry.findItem("minecraft", item[0]),
-		 * stackSize);
-		 * }
-		 */
+		}
 		return null;
 	}
 
@@ -222,16 +189,19 @@ public class Utils {
 	}
 
 	public static ItemStack getOreDict(String name) {
+		LogHelper.mod_debug("oreDictName to check: " + name);
 		ArrayList<ItemStack> oreDict = OreDictionary.getOres(name);
 		for (ItemStack item : oreDict) {
 			String Mod_ID = GameRegistry.findUniqueIdentifierFor(item.getItem()).modId.toLowerCase();
-			LogHelper.mod_debug("***" + Mod_ID + " ***");
-			for (String mod : Reference.PreferredOrder) {
-				if (mod.equals(Mod_ID))
+			LogHelper.mod_debug("oreDict:" + Mod_ID + ": " + item);
+			for (String mod : Reference.PreferredOrder)
+				if (mod.equalsIgnoreCase(Mod_ID)) {
+					LogHelper.mod_debug("Using item: " + item);
 					return item;
-			}
+				}
 		}
 		if (oreDict.size() > 0) {
+			LogHelper.mod_debug(oreDict.get(0).getUnlocalizedName());
 			return oreDict.get(0);
 		} else {
 			return null;
@@ -427,6 +397,35 @@ public class Utils {
 			}
 		});
 		return LIST;
+	}
+
+	public static ItemStack getDictName(String suffix, String subType, String type, String... names) {
+		ItemStack item = null;
+		for (String name : names) {
+			item = Utils.getOreDict(name + suffix);
+			if (item != null) {
+				return item;
+			}
+		}
+		if (suffix.toLowerCase().startsWith(subType)) {
+			suffix = suffix.substring(subType.length());
+			for (String name : names) {
+				item = Utils.getOreDict(name + suffix);
+				if (item != null) {
+					return item;
+				}
+			}
+		}
+		if (suffix.toLowerCase().startsWith(type)) {
+			suffix = suffix.substring(type.length());
+			for (String name : names) {
+				item = Utils.getOreDict(name + suffix);
+				if (item != null) {
+					return item;
+				}
+			}
+		}
+		return null;
 	}
 
 	public static boolean recipeExists(String type, String name) {

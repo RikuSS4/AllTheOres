@@ -21,43 +21,44 @@ import com.rikuss4.alltheores.utility.LogHelper;
 
 public class BlockTexture extends TextureAtlasSprite {
 	private ATOOre ore;
-	private int renderType;
+	private int renderType = 0;
 	private int color;
-	private int type;
+	private int blockType = 0;
+	private String type;
+	private String subType;
 	private String name;
-	private String blockName;
+	private String underlyingBlockName;
 	private Boolean isOverlay;
-	public BufferedImage output_image;
 
-	public BlockTexture(String name, String blockName, int type, int color, int renderType, ATOOre ore, Boolean isOverlay) {
+	public BlockTexture(String name, String type, String subType, int color, int renderType, String underlyingBlockName, Boolean isOverlay) {
 		super(name);
 		this.name = name;
-		this.blockName = blockName;
-		this.renderType = ((ore != null && blockName.equals("denseore")) ? ore.oreDenseRenderType : ((ore != null && blockName.equals("poorore")) ? ore.orePoorRenderType : renderType));
+		this.renderType = renderType;
 		this.type = type;
+		this.subType = subType;
 		this.color = color;
-		this.ore = ore;
+		this.underlyingBlockName = underlyingBlockName;
 		this.isOverlay = isOverlay;
 	}
 
-	public BlockTexture(String name, String blockName, int type, int color, int renderType) {
-		this(name, blockName, type, color, renderType, null, false);
+	public BlockTexture(String name, String type, String subType, int color, int renderType) {
+		this(name, type, subType, color, renderType, null, false);
 	}
 
 	public String getTypeName() {
-		return (this.type == 1 ? "items" : "blocks");
+		return (this.blockType == 1 ? "items" : "blocks");
 	}
 
 	@Override
 	public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
-		ResourceLocation location1 = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", "textures/" + (this.type == 1 ? "items" : "blocks"), location.getResourcePath(), ".png"));
+		ResourceLocation location1 = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", "textures/blocks", location.getResourcePath(), ".png"));
 		try {
-			// check to see if the resource can be loaded (someone added an
-			// override)
+			// check to see if the resource can be loaded (someone added an override)
 			manager.getResource(location1);
-			LogHelper.info("Detected override for " + location.getResourcePath() + ".");
+			LogHelper.info("Override detected for " + location.getResourcePath() + " in " + location.getResourceDomain() + ".");
 			return false;
 		} catch (IOException e) {
+			LogHelper.debug("No override detected for " + location.getResourcePath() + " in " + location.getResourceDomain() + ".");
 			return true;
 		}
 	}
@@ -78,7 +79,7 @@ public class BlockTexture extends TextureAtlasSprite {
 		int h = 16;
 		if (!isOverlay) {
 			try {
-				IResource iResourceUnderlay = manager.getResource(ImageUtils.getResource(ore.underlyingBlockName));
+				IResource iResourceUnderlay = manager.getResource(ImageUtils.getResource(this.underlyingBlockName));
 				background_image = ImageIO.read(iResourceUnderlay.getInputStream());
 
 				w = background_image.getWidth();
@@ -95,7 +96,7 @@ public class BlockTexture extends TextureAtlasSprite {
 		// read grayscale texture to color
 		BufferedImage base_image;
 		try {
-			IResource iResourceBlock = manager.getResource(new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/" + getTypeName() + "/" + this.blockName + "_" + renderType + ".png"));
+			IResource iResourceBlock = manager.getResource(new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/" + getTypeName() + "/" + subType + "_" + renderType + ".png"));
 			base_image = ImageIO.read(iResourceBlock.getInputStream());
 
 			animation = (AnimationMetadataSection) iResourceBlock.getMetadata("animation");
@@ -106,7 +107,7 @@ public class BlockTexture extends TextureAtlasSprite {
 		// read overlay texture
 		BufferedImage overlay_image;
 		try {
-			IResource iResourceOverlay = manager.getResource(new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/" + getTypeName() + "/" + this.blockName + "_overlay_" + renderType + ".png"));
+			IResource iResourceOverlay = manager.getResource(new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/" + getTypeName() + "/" + subType + "_" + renderType + "_overlay.png"));
 			overlay_image = ImageIO.read(iResourceOverlay.getInputStream());
 
 			// if (h != overlay_image.getHeight())
@@ -127,7 +128,7 @@ public class BlockTexture extends TextureAtlasSprite {
 
 		BufferedImage output_image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		base_image = ImageUtils.colorize(base_image, this.color);
-		if (ore != null && ore.subType.equals("dense")) {
+		if (subType.equalsIgnoreCase("dense")) {
 			//output_image = ImageUtils.createDenseTexture(output_image, renderType);
 		}
 
@@ -140,23 +141,23 @@ public class BlockTexture extends TextureAtlasSprite {
 
 		// replace the old texture
 		block_image[0] = output_image;
+		//if(base_image != null)block_image[0] = base_image;
 
 		// write image to filesystem
-		try {
+		if (Reference.DEBUG) {
+			try {
 			new File("SampleImages").mkdir();
-			ImageIO.write(block_image[0], "png", new File("SampleImages\\" + location.getResourcePath().replaceAll("[^A-Za-z0-9()\\[\\]]", "_") + "_" + (renderType) + "_0.png"));
+			ImageIO.write(block_image[0], "png", new File("SampleImages/" + location.getResourcePath().replaceAll("[^A-Za-z0-9()\\[\\]]", "_") + ".png"));
 		} catch (IOException e) {
 			LogHelper.all("Could not find: " + e.getMessage());
 		} catch (IllegalArgumentException e) {
 			LogHelper.all("IllegalArgumentException: " + e.getMessage());
 		}
+		}
 
 		// load the texture
 		this.loadSprite(block_image, animation, (float) Minecraft.getMinecraft().gameSettings.anisotropicFiltering > 1.0F);
-		// LogHelper.all("Successfully generated texture for \"" +
-		// location.getResourcePath() + "\". Place \"" +
-		// location.getResourcePath() +
-		// ".png\" in the assets folder to override.");
+		LogHelper.all("Successfully generated texture for \"" + location.getResourcePath() + "\". Place \"" + location.getResourcePath() + ".png\" in the assets folder to override.");
 		return false;
 	}
 }

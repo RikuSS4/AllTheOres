@@ -25,19 +25,19 @@ import cpw.mods.fml.common.registry.GameRegistry;
 public class AllTheOres {
 	@Mod.Instance(Reference.MOD_ID)
 	public static AllTheOres instance;
+	//Path configDir = null;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
+		Path configDir = Paths.get(e.getModConfigurationDirectory().getPath()
+				+ "/" + Reference.MOD_ID);
+		configHandler.preInit(configDir);
+
 		Reference.isIC2Loaded = Loader.isModLoaded("IC2");
 		Reference.isEIOLoaded = Loader.isModLoaded("EnderIO");
 		Reference.isUBCLoaded = Loader.isModLoaded("UndergroundBiomes");
 
 		ImageUtils.doInit();
-		Path configDir = Paths.get(e.getModConfigurationDirectory().getPath()
-				+ "/" + Reference.MOD_ID);
-
-		configHandler.preInit(configDir);
-
 		// ATO Logo
 		ATOLogo ATOLogo = new ATOLogo();
 		// GameRegistry.registerItem(ATOLogo, ATOLogo.getUnlocalizedName().substring(5));
